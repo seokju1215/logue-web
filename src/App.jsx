@@ -9,7 +9,6 @@ function App() {
       </header>
       <main className="app-main">
         <div className="content-container">
-          {/* 여기에 페이지 내용이 들어갑니다 */}
         </div>
       </main>
       <footer className="app-footer">
