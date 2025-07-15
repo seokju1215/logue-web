@@ -1,21 +1,24 @@
-import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
+import ProfilePage from './pages/ProfilePage'
+import BookPostPage from './pages/BookPostPage'
+import MyPostsPage from './pages/MyPostsPage'
+import PostDetailPage from './pages/PostDetailPage'
+import HomePage from './pages/HomePage'
 
 function App() {
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1>Logue</h1>
-      </header>
-      <main className="app-main">
-        <div className="content-container">
-          {/* 여기에 페이지 내용이 들어갑니다 */}
-        </div>
-      </main>
-      <footer className="app-footer">
-        {/* 푸터 내용 */}
-      </footer>
-    </div>
+    <Router>
+      <div className="app-container">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/u/:username" element={<ProfilePage />} />
+          <Route path="/u/:username/book/:bookId" element={<BookPostPage />} />
+          <Route path="/u/:username/posts/:bookId" element={<MyPostsPage />} />
+          <Route path="/post/:postId" element={<PostDetailPage />} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 

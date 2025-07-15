@@ -1,0 +1,39 @@
+.bio-content {
+  font-size: 14px;
+  color: #191A1C;
+  line-height: 1.2;
+  position: relative;
+  min-height: 2.4em;
+  word-break: break-word;
+}
+
+.bio-content.full {
+  white-space: pre-line;
+}
+
+.bio-truncated {
+  font-size: 14px;
+  color: #191A1C;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+.bio-more {
+  background: none;
+  border: none;
+  color: #858585;
+  font-size: 13px;
+  margin-left: 4px;
+  cursor: pointer;
+  padding: 0;
+  vertical-align: baseline;
+}
+
+.empty-bio {
+  min-height: 2.4em;
+} 

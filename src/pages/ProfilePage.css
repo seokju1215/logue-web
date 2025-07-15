@@ -1,0 +1,365 @@
+/* ProfilePage 스타일 */
+.profile-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  max-width: 375px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* 헤더 */
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 16px 22px;
+  background-color: #ffffff;
+  top: 0;
+  z-index: 100;
+}
+
+.profile-header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  text-align: center;
+}
+
+.header-button {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1a1a;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.header-button:hover {
+  background-color: #f5f5f5;
+}
+
+/* 메인 컨텐츠 */
+.profile-main {
+  padding: 10px 25px 20px;
+}
+
+/* 프로필 정보 */
+.profile-info {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.profile-details {
+  flex: 1;
+}
+
+.profile-details h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 3px 0;
+  line-height: 1.2;
+}
+
+.job {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 9px 0;
+}
+
+.bio {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.profile-avatar {
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 50% !important;
+  border: 1px solid #fafafa;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  transition: box-shadow 0.2s;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
+}
+
+.profile-avatar img {
+  width: 80px !important;
+  height: 80px !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  display: block;
+}
+
+.avatar-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  z-index: 1;
+}
+
+.avatar-modal-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.default-avatar {
+  width: 80px;
+  height: 80px;
+  background-color: #f5f5f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  border: 1px solid #f0f0f0;
+}
+
+/* 팔로워/팔로잉 통계 */
+.follow-stats {
+  display: flex;
+  gap: 27px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.stat-number {
+  font-size: 13px;
+  color: #666;
+  font-weight: 400;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 400;
+}
+
+.follow-btn-ui {
+  margin-left: auto;
+  padding: 0 19px;
+  min-width: 120px;
+  height: 34px;
+  font-size: 13px;
+  color: #191A1C;
+  background: #fff;
+  border: 1px solid #191A1C;
+  border-radius: 5px;
+  font-weight: 400;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: none;
+}
+
+/* hover, active, focus 효과 제거 */
+.follow-btn-ui:active,
+.follow-btn-ui:focus,
+.follow-btn-ui:hover,
+.follow-btn-ui:focus-visible {
+  background: #fff;
+  border-color: #191A1C !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+.bio-content.clickable:hover {
+  background: none;
+}
+
+/* 책장 섹션 */
+.books-section {
+  margin-top: 20px;
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 23px;
+  padding: 0;
+}
+
+.book-item {
+  cursor: pointer;
+  transition: none;
+}
+
+.book-item:hover {
+  transform: none;
+}
+
+.book-cover {
+  width: 100%;
+  aspect-ratio: 98 / 145;
+  overflow: hidden;
+  border-radius: 0;
+  border: 0.5px solid #D9D9D9;
+  box-shadow: none;
+  filter: none;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 0 !important;
+  box-shadow: none;
+  filter: none;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.book-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #999;
+  border-radius: 0;
+}
+
+.book-loading {
+  width: 100%;
+  height: 100%;
+  background-color: #F5F5F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #E0E0E0;
+  border-top: 2px solid #999;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.empty-books {
+  text-align: center;
+  padding: 95px 0 90px;
+  color: #666;
+}
+
+.empty-books p {
+  font-size: 12px;
+  margin: 0;
+}
+
+/* 로딩 및 에러 상태 */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f0f0f0;
+  border-top: 3px solid #1a1a1a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container h2 {
+  font-size: 18px;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.error-container p {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 20px 0;
+}
+
+.back-button {
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.back-button:hover {
+  background-color: #333;
+}
+
+/* 반응형 디자인 */
+@media (min-width: 768px) {
+  .profile-page {
+    border-left: 1px solid #f0f0f0;
+    border-right: 1px solid #f0f0f0;
+  }
+} 
