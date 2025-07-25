@@ -76,13 +76,41 @@ function PostDetailPage() {
   return (
     <div className="post-detail-page">
       {/* AppBar */}
-      <header className="post-detail-header">
-        <button onClick={handleBack} className="header-button">
+      <header style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        padding: '16px 22px',
+        backgroundColor: '#ffffff',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}>
+        <button onClick={handleBack} style={{
+          background: 'none',
+          border: 'none',
+          padding: '8px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#1a1a1a',
+          borderRadius: '4px',
+          transition: 'background-color 0.2s'
+        }}>
           <img src="/src/assets/back_arrow.svg" alt="뒤로가기" width="20" height="20" />
         </button>
-        <h1>
+        <h1 style={{ 
+          flex: 1, 
+          textAlign: 'center',
+          fontSize: '16px',
+          fontWeight: '500',
+          color: '#1a1a1a',
+          margin: 0
+        }}>
           {userName}
         </h1>
+        <div style={{ width: '36px' }}></div>
       </header>
 
       {/* DownloadDialog */}
