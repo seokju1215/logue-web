@@ -1,21 +1,25 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, User, BookOpen, Heart, MessageCircle, Share } from '../components/icons'
+import { useState, useEffect, useRef } from 'react'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { getProfileByUsername, getUserBooksWithProfiles } from '../lib/supabase'
-import PostContent from '../components/PostContent'
+import PostItem from '../components/PostItem'
 import './MyPostsPage.css'
 
 function MyPostsPage() {
-  const { username, bookId } = useParams()
+  const { username } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
+  const bookId = location.state?.bookId
   const [profile, setProfile] = useState(null)
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [initialIndex, setInitialIndex] = useState(0)
+  const [hasDeleted, setHasDeleted] = useState(false)
+  const itemRefs = useRef([])
 
   useEffect(() => {
     fetchPosts()
+    // eslint-disable-next-line
   }, [username, bookId])
 
   const fetchPosts = async () => {
@@ -32,10 +36,27 @@ function MyPostsPage() {
       // 현재 사용자의 포스트만 필터링
       const userPosts = postsData.filter(post => post.user_id === profileData.id)
       
+      // posts 데이터에 프로필 정보 추가
+      const postsWithProfile = userPosts.map(post => {
+        console.log('Original post data:', post) // 디버깅용
+        const mappedPost = {
+          ...post,
+          avatarUrl: profileData.avatar_url || '',
+          userName: profileData.name || username,
+          image: post.image || '',
+          reviewTitle: post.review_title || '',
+          reviewContent: post.review_content || ''
+        }
+        console.log('Mapped post data:', mappedPost) // 디버깅용
+        return mappedPost
+      })
+      
+      console.log('All posts with profile:', postsWithProfile) // 디버깅용
+      
       // bookId가 있으면 해당 책의 인덱스 찾기
       let index = 0
       if (bookId) {
-        const foundIndex = userPosts.findIndex(post => 
+        const foundIndex = postsWithProfile.findIndex(post => 
           post.book_id === bookId || post.books?.id === bookId
         )
         if (foundIndex !== -1) {
@@ -43,8 +64,9 @@ function MyPostsPage() {
         }
       }
       
-      setPosts(userPosts)
+      setPosts(postsWithProfile)
       setInitialIndex(index)
+      itemRefs.current = Array(postsWithProfile.length).fill(null)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -52,23 +74,49 @@ function MyPostsPage() {
     }
   }
 
+  const scrollToInitialIndex = async () => {
+    await new Promise(resolve => setTimeout(resolve, 120))
+    
+    if (initialIndex < itemRefs.current.length && itemRefs.current[initialIndex]) {
+      itemRefs.current[initialIndex].scrollIntoView({ 
+        behavior: 'auto', 
+        block: 'start',
+        inline: 'nearest'
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (!loading && posts.length > 0) {
+      scrollToInitialIndex()
+    }
+  }, [loading, posts, initialIndex])
+
   const handleBack = () => {
-    navigate(`/u/${username}`)
+    navigate(`/u/${username}`, { state: { hasDeleted } })
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  const handleDeleteSuccess = (index) => {
+    setPosts(prev => prev.filter((_, i) => i !== index))
+    setHasDeleted(true)
+    navigate(`/u/${username}`, { state: { hasDeleted: true } })
+  }
+
+  const handleEditSuccess = () => {
+    fetchPosts()
+  }
+
+  const handlePostTap = async (post) => {
+    // 포스트 상세 페이지로 이동
+    const result = await navigate(`/post/${post.id}`, { 
+      state: { post },
+      replace: false
     })
-  }
-
-  const handlePostClick = (post) => {
-    // 포스트 상세 페이지로 이동 (향후 구현)
-    console.log('포스트 클릭:', post)
+    
+    if (result === true) {
+      await fetchPosts()
+      setHasDeleted(true)
+    }
   }
 
   if (loading) {
@@ -103,107 +151,59 @@ function MyPostsPage() {
     )
   }
 
-  const currentPost = posts[initialIndex] || posts[0]
-  const book = currentPost.books || {}
+  const appBarTitle = posts.length > 0 && posts[initialIndex]?.userName 
+    ? posts[initialIndex].userName 
+    : '사용자'
 
   return (
     <div className="my-posts-page">
-      {/* 헤더 */}
+      {/* AppBar */}
       <header className="my-posts-header">
         <button onClick={handleBack} className="header-button">
-          <ArrowLeft size={20} />
+          <svg width="20" height="20" fill="none" stroke="#1A1A1A" strokeWidth="2" viewBox="0 0 24 24">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
         </button>
-        <h1>{profile?.name || username}</h1>
+        <h1 style={{ 
+          fontSize: '16px', 
+          color: '#1A1A1A', 
+          fontWeight: '500',
+          margin: 0
+        }}>
+          {appBarTitle}
+        </h1>
         <div></div> {/* 빈 공간으로 중앙 정렬 */}
       </header>
 
-      <main className="my-posts-main">
+      {/* ListView */}
+      <main className="my-posts-main" style={{ 
+        padding: '16px 0',
+        overflowY: 'auto',
+        height: 'calc(100vh - 56px)'
+      }}>
         {posts.map((post, index) => {
-          const book = post.books || {}
-          const isActive = index === initialIndex
-          
+          const currentUserId = profile?.id // 실제로는 현재 로그인한 사용자 ID
+          const isMyPost = currentUserId && currentUserId === post.user_id
+
           return (
-            <article 
-              key={post.id} 
-              className={`post-item ${isActive ? 'active' : ''}`}
-              onClick={() => handlePostClick(post)}
+            <div
+              key={post.id}
+              ref={el => itemRefs.current[index] = el}
+              style={{
+                paddingLeft: 22,
+                paddingRight: 22,
+                paddingTop: 51,
+                paddingBottom: 27,
+              }}
             >
-              {/* 책 정보 */}
-              <section className="book-info-section">
-                <div className="book-cover-container">
-                  {book.image ? (
-                    <img src={book.image} alt={book.title} className="book-cover" />
-                  ) : (
-                    <div className="book-cover-placeholder">
-                      <BookOpen size={60} />
-                    </div>
-                  )}
-                </div>
-                
-                <div className="book-details">
-                  <h2>{book.title || '제목 없음'}</h2>
-                  <p className="book-author">{book.author || '저자 정보 없음'}</p>
-                  {book.publisher && (
-                    <p className="book-publisher">{book.publisher}</p>
-                  )}
-                  {book.published_date && (
-                    <p className="book-date">{book.published_date}</p>
-                  )}
-                </div>
-              </section>
-
-              {/* 작성자 정보 */}
-              <section className="author-section">
-                <div className="author-info">
-                  <div className="author-avatar">
-                    {profile?.avatar_url && profile.avatar_url !== 'basic' ? (
-                      <img src={profile.avatar_url} alt={profile.name} />
-                    ) : (
-                      <div className="default-avatar">
-                        <User size={24} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="author-details">
-                    <h3>{profile?.name || username}</h3>
-                    {profile?.job && <p className="author-job">{profile.job}</p>}
-                  </div>
-                </div>
-              </section>
-
-              {/* 리뷰 제목 */}
-              {post.review_title && (
-                <section className="review-title-section">
-                  <h3 className="review-title">{post.review_title}</h3>
-                </section>
-              )}
-
-              {/* 리뷰 내용 - PostContent 컴포넌트 사용 */}
-              <section className="review-content-section">
-                <PostContent post={post} onTapMore={fetchPosts} />
-              </section>
-
-              {/* 포스트 메타 정보 */}
-              <section className="post-meta">
-                <div className="post-date">
-                  {formatDate(post.created_at)}
-                </div>
-                
-                <div className="post-actions">
-                  <button className="action-button">
-                    <Heart size={16} />
-                    <span>0</span>
-                  </button>
-                  <button className="action-button">
-                    <MessageCircle size={16} />
-                    <span>0</span>
-                  </button>
-                  <button className="action-button">
-                    <Share size={16} />
-                  </button>
-                </div>
-              </section>
-            </article>
+              <PostItem
+                isMyPost={isMyPost}
+                post={post}
+                onDeleteSuccess={() => handleDeleteSuccess(index)}
+                onEditSuccess={handleEditSuccess}
+                onTap={() => handlePostTap(post)}
+              />
+            </div>
           )
         })}
       </main>

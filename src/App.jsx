@@ -8,13 +8,13 @@ import HomePage from './pages/HomePage'
 
 function App() {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="app-container">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/u/:username" element={<ProfilePage />} />
           <Route path="/u/:username/book/:bookId" element={<BookPostPage />} />
-          <Route path="/u/:username/posts/:bookId" element={<MyPostsPage />} />
+          <Route path="/u/:username/posts" element={<MyPostsPage />} />
           <Route path="/post/:postId" element={<PostDetailPage />} />
         </Routes>
       </div>
