@@ -9,7 +9,7 @@ function DownloadDialog({ onClose, onEdit, onDelete }) {
   }
 
   const handleEditClick = () => {
-    onEdit()
+    window.open('https://linkbio.co/loguepublic', '_blank')
     onClose()
   }
 
@@ -53,11 +53,15 @@ function DownloadDialog({ onClose, onEdit, onDelete }) {
                 color: 'white',
                 border: 'none',
                 borderRadius: '5px',
-                padding: '8px 72px',
+                padding: '8px 16px',
                 fontSize: '16px',
                 cursor: 'pointer',
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                minWidth: '200px',
+                whiteSpace: 'nowrap',
+                width: '100%',
+                maxWidth: '280px'
               }}
             >
               Logue 앱 열기

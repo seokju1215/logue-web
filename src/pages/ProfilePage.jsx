@@ -5,6 +5,7 @@ import { getProfileByUsername, getUserBooks } from '../lib/supabase'
 import './ProfilePage.css'
 import BioContent from '../components/BioContent'
 import DownloadDialog from '../components/DownloadDialog'
+import { flutterSize } from '../utils/dpUtils'
 
 function ProfilePage() {
   const { username } = useParams()
@@ -107,7 +108,13 @@ function ProfilePage() {
   return (
     <div className="profile-page">
       {/* 헤더 */}
-      <header className="profile-header">
+      <header className="profile-header" style={{ 
+        padding: `${flutterSize(16)}px ${flutterSize(25)}px`,
+        minHeight: `${flutterSize(56)}px`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
         <h1>{profile?.username || '사용자'}</h1>
       </header>
 
@@ -136,7 +143,7 @@ function ProfilePage() {
         />
       )}
 
-      <main className="profile-main">
+      <main className="profile-main" style={{ padding: `10px ${flutterSize(25)}px 20px` }}>
         {/* 프로필 정보 */}
         <section className="profile-info">
           <div className="profile-details">
@@ -175,7 +182,10 @@ function ProfilePage() {
         {/* 책장 */}
         <section className="books-section">
           {books.length > 0 ? (
-            <div className="books-grid">
+            <div className="books-grid" style={{ 
+              columnGap: `${flutterSize(23)}px`,
+              rowGap: `${flutterSize(30)}px`
+            }}>
               {books.map((book, index) => {
                 const bookId = book.id
                 const imageUrl = book.books?.image || ''

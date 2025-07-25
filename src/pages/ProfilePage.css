@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 16px 22px;
+  padding: 16px 20px;
   background-color: #ffffff;
   top: 0;
   z-index: 100;
@@ -50,7 +50,7 @@
 
 /* 메인 컨텐츠 */
 .profile-main {
-  padding: 10px 25px 20px;
+  padding: 10px 22px 20px;
 }
 
 /* 프로필 정보 */

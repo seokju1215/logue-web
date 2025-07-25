@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, User, MoreVertical } from '../components/icons'
 import DownloadDialog from '../components/DownloadDialog'
 import './PostDetailPage.css'
+import { flutterSize } from '../utils/dpUtils'
 
 function PostDetailPage() {
   const { postId } = useParams()
@@ -80,7 +81,8 @@ function PostDetailPage() {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'space-between',
-        padding: '16px 22px',
+        padding: `${flutterSize(16)}px ${flutterSize(22)}px`,
+        minHeight: `${flutterSize(56)}px`,
         backgroundColor: '#ffffff',
         position: 'sticky',
         top: 0,
