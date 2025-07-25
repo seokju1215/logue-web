@@ -100,7 +100,7 @@ function PostDetailPage() {
           borderRadius: '4px',
           transition: 'background-color 0.2s'
         }}>
-          <img src="/src/assets/back_arrow.svg" alt="뒤로가기" width="20" height="20" />
+          <img src="/back_arrow.svg" alt="뒤로가기" width="20" height="20" />
         </button>
         <h1 style={{ 
           flex: 1, 
