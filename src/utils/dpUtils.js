@@ -16,4 +16,16 @@ export const flutterSize = (dp) => {
   // 실제 테스트를 통해 조정된 값
   const baseRatio = 1;
   return dp * baseRatio;
+};
+
+// Flutter dp를 퍼센트로 변환하는 함수
+export const flutterPercent = (dp) => {
+  // Flutter 기본 화면 너비 375dp 기준
+  const baseWidth = 375;
+  return (dp / baseWidth) * 100;
+};
+
+// 화면 너비 기준 퍼센트 계산
+export const getPercent = (dp) => {
+  return `${flutterPercent(dp)}%`;
 }; 

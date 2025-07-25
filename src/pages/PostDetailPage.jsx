@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, User, MoreVertical } from '../components/icons'
 import DownloadDialog from '../components/DownloadDialog'
 import './PostDetailPage.css'
-import { flutterSize } from '../utils/dpUtils'
+import { flutterSize, getPercent } from '../utils/dpUtils'
 
 function PostDetailPage() {
   const { postId } = useParams()
@@ -81,7 +81,7 @@ function PostDetailPage() {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'space-between',
-        padding: `${flutterSize(16)}px ${flutterSize(22)}px`,
+        padding: `${flutterSize(16)}px ${getPercent(22)}`,
         minHeight: `${flutterSize(56)}px`,
         backgroundColor: '#ffffff',
         position: 'sticky',
@@ -91,14 +91,15 @@ function PostDetailPage() {
         <button onClick={handleBack} style={{
           background: 'none',
           border: 'none',
-          padding: '8px',
+          padding: '4px',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: '#1a1a1a',
           borderRadius: '4px',
-          transition: 'background-color 0.2s'
+          transition: 'background-color 0.2s',
+          marginLeft: '-4px'
         }}>
           <img src="/back_arrow.svg" alt="뒤로가기" width="20" height="20" />
         </button>

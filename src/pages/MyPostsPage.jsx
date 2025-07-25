@@ -4,7 +4,7 @@ import { getProfileByUsername, getUserBooksWithProfiles } from '../lib/supabase'
 import PostItem from '../components/PostItem'
 import DownloadDialog from '../components/DownloadDialog'
 import './MyPostsPage.css'
-import { flutterSize } from '../utils/dpUtils'
+import { flutterSize, getPercent } from '../utils/dpUtils'
 
 function MyPostsPage() {
   const { username } = useParams()
@@ -165,7 +165,7 @@ function MyPostsPage() {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'space-between',
-        padding: `${flutterSize(16)}px ${flutterSize(22)}px`,
+        padding: `${flutterSize(16)}px ${getPercent(22)}`,
         minHeight: `${flutterSize(56)}px`,
         backgroundColor: '#ffffff',
         position: 'sticky',
@@ -175,14 +175,15 @@ function MyPostsPage() {
         <button onClick={handleBack} style={{
           background: 'none',
           border: 'none',
-          padding: '8px',
+          padding: '4px',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: '#1a1a1a',
           borderRadius: '4px',
-          transition: 'background-color 0.2s'
+          transition: 'background-color 0.2s',
+          marginLeft: '-4px'
         }}>
           <img src="/back_arrow.svg" alt="뒤로가기" width="20" height="20" />
         </button>
