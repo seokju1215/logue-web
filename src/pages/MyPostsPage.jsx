@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { getProfileByUsername, getUserBooksWithProfiles } from '../lib/supabase'
 import PostItem from '../components/PostItem'
+import DownloadDialog from '../components/DownloadDialog'
 import './MyPostsPage.css'
 
 function MyPostsPage() {
@@ -15,6 +16,7 @@ function MyPostsPage() {
   const [error, setError] = useState(null)
   const [initialIndex, setInitialIndex] = useState(0)
   const [hasDeleted, setHasDeleted] = useState(false)
+  const [showDownloadDialog, setShowDownloadDialog] = useState(false)
   const itemRefs = useRef([])
 
   useEffect(() => {
@@ -160,20 +162,21 @@ function MyPostsPage() {
       {/* AppBar */}
       <header className="my-posts-header">
         <button onClick={handleBack} className="header-button">
-          <svg width="20" height="20" fill="none" stroke="#1A1A1A" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
+          <img src="/src/assets/back_arrow.svg" alt="뒤로가기" width="20" height="20" />
         </button>
-        <h1 style={{ 
-          fontSize: '16px', 
-          color: '#1A1A1A', 
-          fontWeight: '500',
-          margin: 0
-        }}>
+        <h1>
           {appBarTitle}
         </h1>
-        <div></div> {/* 빈 공간으로 중앙 정렬 */}
       </header>
+
+      {/* DownloadDialog */}
+      {showDownloadDialog && (
+        <DownloadDialog 
+          onClose={() => setShowDownloadDialog(false)}
+          onEdit={() => setShowDownloadDialog(false)}
+          onDelete={() => setShowDownloadDialog(false)}
+        />
+      )}
 
       {/* ListView */}
       <main className="my-posts-main" style={{ 
@@ -202,6 +205,7 @@ function MyPostsPage() {
                 onDeleteSuccess={() => handleDeleteSuccess(index)}
                 onEditSuccess={handleEditSuccess}
                 onTap={() => handlePostTap(post)}
+                onBookExplore={() => setShowDownloadDialog(true)}
               />
             </div>
           )

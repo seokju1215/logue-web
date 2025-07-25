@@ -1,0 +1,65 @@
+/* PostActionDialog 스타일 */
+.post-action-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-action-dialog-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.post-action-dialog-container {
+  position: relative;
+  width: 300px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: dialogFadeIn 0.2s ease-out;
+  margin: auto;
+  z-index: 1001;
+
+  
+}
+
+.post-action-dialog-content {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes dialogFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 400px) {
+  .post-action-dialog-container {
+    width: 280px;
+    margin: 0 20px;
+  }
+} 

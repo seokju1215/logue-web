@@ -11,18 +11,16 @@
 .post-detail-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 16px 22px;
   background-color: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
 .post-detail-header h1 {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 500;
   color: #1a1a1a;
   margin: 0;
   flex: 1;

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import BookFrame from './BookFrame'
 import PostContent from './PostContent'
 
-function PostItem({ post, isMyPost, onDeleteSuccess, onEditSuccess, onTap }) {
+function PostItem({ post, isMyPost, onDeleteSuccess, onEditSuccess, onTap, onBookExplore }) {
   const navigate = useNavigate()
   
   const imageUrl = post.image || ''
@@ -160,44 +160,24 @@ function PostItem({ post, isMyPost, onDeleteSuccess, onEditSuccess, onTap }) {
         <div style={{ flex: 1 }}></div>
         
         {/* 조건부 버튼들 */}
-        {isMyPost ? (
-          <button
-            onClick={handleBookDetailClick}
-            style={{
-              border: '1px solid #B0B0B0', // AppColors.black300
-              borderRadius: '5px',
-              padding: '0 19px',
-              height: '34px',
-              fontSize: '14px',
-              color: '#858585', // AppColors.black500
-              lineHeight: '1',
-              fontWeight: '400',
-              backgroundColor: 'transparent',
-              cursor: 'pointer',
-              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
-            }}
-          >
-            책 둘러보기 →
-          </button>
-        ) : (
-          <button
-            onClick={handleBookDetailClick}
-            style={{
-              border: '1px solid #B0B0B0', // AppColors.black300
-              borderRadius: '5px',
-              padding: '0 19px',
-              height: '34px',
-              fontSize: '14px',
-              color: '#858585', // AppColors.black500
-              fontWeight: '400',
-              backgroundColor: 'transparent',
-              cursor: 'pointer',
-              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
-            }}
-          >
-            책 둘러보기 →
-          </button>
-        )}
+        <button
+          onClick={typeof onBookExplore === 'function' ? onBookExplore : handleBookDetailClick}
+          style={{
+            border: '1px solid #B0B0B0', // AppColors.black300
+            borderRadius: '5px',
+            padding: '0 19px',
+            height: '34px',
+            fontSize: '14px',
+            color: '#858585', // AppColors.black500
+            lineHeight: '1',
+            fontWeight: '400',
+            backgroundColor: 'transparent',
+            cursor: 'pointer',
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+          }}
+        >
+          책 둘러보기 →
+        </button>
       </div>
       
       {/* SizedBox(height: 10) */}

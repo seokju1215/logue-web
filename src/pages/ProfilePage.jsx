@@ -4,6 +4,7 @@ import { User } from '../components/icons'
 import { getProfileByUsername, getUserBooks } from '../lib/supabase'
 import './ProfilePage.css'
 import BioContent from '../components/BioContent'
+import DownloadDialog from '../components/DownloadDialog'
 
 function ProfilePage() {
   const { username } = useParams()
@@ -13,6 +14,7 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showAvatarModal, setShowAvatarModal] = useState(false)
+  const [showDownloadDialog, setShowDownloadDialog] = useState(false)
   const [imageLoadingStates, setImageLoadingStates] = useState({})
   const [imageErrorStates, setImageErrorStates] = useState({})
 
@@ -119,6 +121,21 @@ function ProfilePage() {
         </div>
       )}
 
+      {/* DownloadDialog */}
+      {showDownloadDialog && (
+        <DownloadDialog 
+          onClose={() => setShowDownloadDialog(false)}
+          onEdit={() => {
+            console.log('Edit clicked')
+            setShowDownloadDialog(false)
+          }}
+          onDelete={() => {
+            console.log('Delete clicked')
+            setShowDownloadDialog(false)
+          }}
+        />
+      )}
+
       <main className="profile-main">
         {/* 프로필 정보 */}
         <section className="profile-info">
@@ -139,14 +156,20 @@ function ProfilePage() {
         {/* 팔로워/팔로잉 카운트 */}
         <section className="follow-stats">
           <div className="stat-item">
-            <span className="stat-label">팔로워</span>
-            <span className="stat-number">{profile?.followers || 0}</span>
+            <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로워</span>
+            <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.followers || 0}</span>
           </div>
           <div className="stat-item">
-            <span className="stat-label">팔로잉</span>
-            <span className="stat-number">{profile?.following || 0}</span>
+            <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로잉</span>
+            <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.following || 0}</span>
           </div>
-          <button className="follow-btn-ui" type="button">팔로우 +</button>
+          <button 
+            className="follow-btn-ui" 
+            type="button"
+            onClick={() => setShowDownloadDialog(true)}
+          >
+            팔로우 +
+          </button>
         </section>
 
         {/* 책장 */}

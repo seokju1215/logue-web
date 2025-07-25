@@ -44,7 +44,7 @@ function PostContent({ post, onTapMore }) {
   }
 
   const handleMoreClick = async () => {
-    // PostDetailScreen으로 이동
+    // PostDetailPage로 이동
     const result = await navigate(`/post/${post.id}`, { 
       state: { post },
       replace: false
