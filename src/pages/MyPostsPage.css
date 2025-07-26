@@ -2,7 +2,7 @@
 .my-posts-page {
   min-height: 100vh;
   background-color: #ffffff;
-  max-width: 375px;
+  max-width: 430px;
   margin: 0 auto;
   position: relative;
 }
@@ -77,7 +77,7 @@
   flex-shrink: 0;
 }
 
-.book-cover {
+.my-posts-book-cover {
   width: 80px;
   height: 120px;
   object-fit: cover;
@@ -85,7 +85,7 @@
   box-shadow: none;
 }
 
-.book-cover-placeholder {
+.my-posts-book-cover-placeholder {
   width: 80px;
   height: 120px;
   background-color: #f5f5f5;

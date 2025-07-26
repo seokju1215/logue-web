@@ -92,9 +92,9 @@ function BookPostPage() {
         <section className="book-info-section">
           <div className="book-cover-container">
             {book.image ? (
-              <img src={book.image} alt={book.title} className="book-cover" />
+              <img src={book.image} alt={book.title} className="book-post-cover" />
             ) : (
-              <div className="book-cover-placeholder">
+              <div className="book-post-cover-placeholder">
                 <BookOpen size={60} />
               </div>
             )}

@@ -4,7 +4,7 @@ import { getProfileByUsername, getUserBooksWithProfiles } from '../lib/supabase'
 import PostItem from '../components/PostItem'
 import DownloadDialog from '../components/DownloadDialog'
 import './MyPostsPage.css'
-import { flutterSize, getPercent } from '../utils/dpUtils'
+import React from 'react'
 
 function MyPostsPage() {
   const { username } = useParams()
@@ -165,8 +165,8 @@ function MyPostsPage() {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'space-between',
-        padding: `${flutterSize(16)}px ${getPercent(22)}`,
-        minHeight: `${flutterSize(56)}px`,
+        padding: '16px 22px',
+        minHeight: '56px',
         backgroundColor: '#ffffff',
         position: 'sticky',
         top: 0,

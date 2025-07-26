@@ -25,22 +25,77 @@ function PostContent({ post, onTapMore }) {
     const moreText = '더보기'
     const ellipsis = '... '
     
-    // 간단한 문자 수 기반 계산으로 성능 향상
-    const estimatedCharsPerLine = 35 // 대략적인 한 줄당 문자 수
-    const estimatedMaxChars = estimatedCharsPerLine * maxLines
+    // DOM 기반 텍스트 측정으로 정확한 계산
+    const textStyle = {
+      fontSize: '14px',
+      color: '#858585',
+      lineHeight: '2',
+      letterSpacing: '-0.32px',
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+    }
 
-    if (fullText.length <= estimatedMaxChars) {
-      // 예상 5줄 이하면 전체 텍스트 표시
+    // 임시 요소 생성하여 텍스트 측정
+    const tempElement = document.createElement('div')
+    tempElement.style.cssText = `
+      position: absolute;
+      visibility: hidden;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: ${textStyle.fontSize};
+      line-height: ${textStyle.lineHeight};
+      letter-spacing: ${textStyle.letterSpacing};
+      font-family: ${textStyle.fontFamily};
+      width: calc(100vw - 44px);
+      max-width: 386px;
+    `
+    document.body.appendChild(tempElement)
+
+    // 전체 텍스트가 5줄을 넘는지 확인
+    tempElement.textContent = fullText
+    const fullTextHeight = tempElement.offsetHeight
+    const lineHeight = parseInt(textStyle.lineHeight) * parseInt(textStyle.fontSize)
+    const maxHeight = lineHeight * maxLines
+
+    if (fullTextHeight <= maxHeight) {
+      // 5줄 이하면 전체 텍스트 표시
       setDisplayText(fullText)
       setShouldShowMoreButton(false)
       setIsCalculated(true)
-    } else {
-      // 예상 5줄 초과면 자르기
-      const truncatedText = fullText.substring(0, estimatedMaxChars - 10) + '... '
-      setDisplayText(truncatedText)
-      setShouldShowMoreButton(true)
-      setIsCalculated(true)
+      document.body.removeChild(tempElement)
+      return
     }
+
+    // 5줄을 넘으면 정확한 위치 찾기
+    let start = 0
+    let end = fullText.length
+    let result = ''
+
+    while (start <= end) {
+      const mid = Math.floor((start + end) / 2)
+      const testText = fullText.substring(0, mid) + ellipsis + moreText
+      tempElement.textContent = testText
+      
+      if (tempElement.offsetHeight <= maxHeight) {
+        result = testText
+        start = mid + 1
+      } else {
+        end = mid - 1
+      }
+    }
+
+    // "더보기" 텍스트를 제외하고 다시 계산
+    const finalText = result.replace(ellipsis + moreText, '')
+    tempElement.textContent = finalText + ellipsis
+    if (tempElement.offsetHeight <= maxHeight) {
+      setDisplayText(finalText + ellipsis)
+    } else {
+      // 안전하게 더 짧게 자르기
+      setDisplayText(fullText.substring(0, Math.floor(fullText.length * 0.7)) + ellipsis)
+    }
+    
+    setShouldShowMoreButton(true)
+    setIsCalculated(true)
+    document.body.removeChild(tempElement)
   }
 
   const handleMoreClick = async () => {

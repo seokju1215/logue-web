@@ -5,7 +5,7 @@ import { getProfileByUsername, getUserBooks } from '../lib/supabase'
 import './ProfilePage.css'
 import BioContent from '../components/BioContent'
 import DownloadDialog from '../components/DownloadDialog'
-import { flutterSize, getPercent } from '../utils/dpUtils'
+import React from 'react'
 
 function ProfilePage() {
   const { username } = useParams()
@@ -109,8 +109,8 @@ function ProfilePage() {
     <div className="profile-page">
       {/* 헤더 */}
       <header className="profile-header" style={{ 
-        padding: `${flutterSize(16)}px ${getPercent(25)}`,
-        minHeight: `${flutterSize(56)}px`,
+        padding: '16px 25px',
+        minHeight: '56px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -143,7 +143,7 @@ function ProfilePage() {
         />
       )}
 
-      <main className="profile-main" style={{ padding: `10px ${getPercent(25)} 20px` }}>
+      <main className="profile-main" style={{ padding: '10px 25px 20px' }}>
         {/* 프로필 정보 */}
         <section className="profile-info">
           <div className="profile-details">
@@ -183,8 +183,8 @@ function ProfilePage() {
         <section className="books-section">
           {books.length > 0 ? (
             <div className="books-grid" style={{ 
-              columnGap: getPercent(23),
-              rowGap: getPercent(30)
+              columnGap: '23px',
+              rowGap: '30px'
             }}>
               {books.map((book, index) => {
                 const bookId = book.id
