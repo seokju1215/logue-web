@@ -23,6 +23,20 @@ function ProfilePage() {
     fetchProfile()
   }, [username])
 
+  // GA 방문자 추적
+  useEffect(() => {
+    if (profile && !loading) {
+      // GA 이벤트 전송
+      if (window.gtag) {
+        gtag('event', 'profile_view', {
+          'profile_user_id': profile.id,
+          'profile_username': username,
+          'profile_name': profile.name || ''
+        })
+      }
+    }
+  }, [profile, username, loading])
+
   const fetchProfile = async () => {
     try {
       setLoading(true)
