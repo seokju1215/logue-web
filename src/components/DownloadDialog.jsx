@@ -9,7 +9,7 @@ function DownloadDialog({ onClose, onEdit, onDelete }) {
   }
 
   const handleEditClick = () => {
-    window.open('https://linkbio.co/loguepublic', '_blank')
+    window.open('https://linkbio.co/loguelogue', '_blank')
     onClose()
   }
 
