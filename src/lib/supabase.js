@@ -48,7 +48,7 @@ export const getProfileByUsername = async (username) => {
   }
 }
 
-// 사용자의 책들 가져오기 (order_index로 정렬)
+// 사용자의 책들 가져오기 (order_index로 정렬, archived되지 않은 것만)
 export const getUserBooks = async (userId) => {
   try {
     const { data, error } = await supabase
@@ -58,6 +58,7 @@ export const getUserBooks = async (userId) => {
         books (*)
       `)
       .eq('user_id', userId)
+      .eq('is_archived', false)
       .order('order_index', { ascending: true })
 
     if (error) throw error

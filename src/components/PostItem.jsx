@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import BookFrame from './BookFrame'
 import PostContent from './PostContent'
+import basicAvatar from '../assets/basic_avatar.png'
 
 function PostItem({ post, isMyPost, onDeleteSuccess, onEditSuccess, onTap, onBookExplore }) {
   const navigate = useNavigate()
@@ -114,7 +115,7 @@ function PostItem({ post, isMyPost, onDeleteSuccess, onEditSuccess, onTap, onBoo
                 overflow: 'hidden'
               }}>
                 <img 
-                  src="/assets/basic_avatar.png" 
+                  src={basicAvatar} 
                   alt="기본 아바타"
                   style={{ width: '45px', height: '45px', objectFit: 'cover' }}
                   onError={(e) => {

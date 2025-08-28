@@ -6,6 +6,7 @@ import './ProfilePage.css'
 import BioContent from '../components/BioContent'
 import DownloadDialog from '../components/DownloadDialog'
 import React from 'react'
+import basicAvatar from '../assets/basic_avatar.png'
 
 function ProfilePage() {
   const { username } = useParams()
@@ -137,7 +138,13 @@ function ProfilePage() {
         <div className="avatar-modal" onClick={handleCloseAvatarModal}>
           <div className="avatar-modal-backdrop" />
           <div className="avatar-modal-content">
-            <img src={avatarUrl} alt="프로필 확대" width={250} height={250} style={{borderRadius: '50%'}} />
+            <img 
+              src={profile?.avatar_url && profile.avatar_url !== 'basic' ? profile.avatar_url : basicAvatar} 
+              alt="프로필 확대" 
+              width={250} 
+              height={250} 
+              style={{borderRadius: '50%'}} 
+            />
           </div>
         </div>
       )}
@@ -169,7 +176,7 @@ function ProfilePage() {
             {profile?.avatar_url && profile.avatar_url !== 'basic' ? (
               <img src={profile.avatar_url} alt={profile.name} />
             ) : (
-              <img src="/assets/basic_avatar.png" alt="기본 아바타" />
+              <img src={basicAvatar} alt="기본 아바타" />
             )}
           </div>
         </section>
