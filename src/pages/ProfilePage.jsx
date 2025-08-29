@@ -203,14 +203,7 @@ function ProfilePage() {
             {/* job이 비어있을 때 */}
             {(!profile?.job || profile.job === '') && (
               <>
-                <div style={{ height: '5px' }}></div>
-                <div style={{
-                  fontSize: '15px',
-                  color: '#858585', // AppColors.black500
-                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
-                }}>
-                  
-                </div>
+                <div style={{ height: '22px' }}></div>
               </>
             )}
             
