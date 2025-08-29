@@ -168,9 +168,53 @@ function ProfilePage() {
         {/* 프로필 정보 */}
         <section className="profile-info">
           <div className="profile-details">
-            <h2>{profile?.name || '이름 없음'}</h2>
-            <p className="job">{profile?.job || '직업 정보 없음'}</p>
+            <div style={{
+              fontSize: '22px',
+              color: '#1A1A1A', // AppColors.black900
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+            }}>
+              {profile?.name || ''}
+            </div>
+            
+            {/* SizedBox(height: 3) */}
+            <div style={{ height: '3px' }}></div>
+            
+            {/* job이 비어있을 때 */}
+            {(!profile?.job || profile.job === '') && (
+              <div style={{ height: '4px' }}></div>
+            )}
+            
+            {/* job이 있을 때 */}
+            {profile?.job && profile.job !== '' && (
+              <>
+                <div style={{
+                  fontSize: '15px',
+                  color: '#858585', // AppColors.black500
+                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+                }}>
+                  {profile.job}
+                </div>
+                <div style={{ height: '9px' }}></div>
+              </>
+            )}
+            
             <BioContent bio={profile?.bio || ''} />
+            
+            {/* job이 비어있을 때 */}
+            {(!profile?.job || profile.job === '') && (
+              <>
+                <div style={{ height: '5px' }}></div>
+                <div style={{
+                  fontSize: '15px',
+                  color: '#858585', // AppColors.black500
+                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+                }}>
+                  
+                </div>
+              </>
+            )}
+            
+            <div style={{ height: '9px' }}></div>
           </div>
           <div className="profile-avatar" onClick={handleAvatarClick}>
             {profile?.avatar_url && profile.avatar_url !== 'basic' ? (
