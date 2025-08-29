@@ -7,7 +7,7 @@ function BioContent({ bio }) {
   const isLong = bio && bio.length > 40
 
   if (!bio) {
-    return <div className="bio-content empty-bio" style={{ minHeight: '2.4em' }}></div>
+    return <div className="bio-content empty-bio" style={{ minHeight: '33.5px' }}></div>
   }
 
   if (showFull || !isLong) {
