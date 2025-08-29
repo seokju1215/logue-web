@@ -248,7 +248,8 @@ function PostDetailPage() {
           color: '#858585', // AppColors.black500
           lineHeight: '2',
           letterSpacing: '-0.32px',
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+          whiteSpace: 'pre-line'
         }}>
           {reviewContent}
         </div>
