@@ -203,7 +203,7 @@ function ProfilePage() {
             {/* job이 비어있을 때 */}
             {(!profile?.job || profile.job === '') && (
               <>
-                <div style={{ height: '22px' }}></div>
+                <div style={{ height: '27.5px' }}></div>
               </>
             )}
             
