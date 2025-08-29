@@ -1,16 +1,15 @@
 import { useState } from 'react'
+import LinesEllipsis from 'react-lines-ellipsis'
 import './BioContent.css'
 
 function BioContent({ bio }) {
   const [showFull, setShowFull] = useState(false)
-  // 2줄이 넘는지 판단하는 간단한 fallback (글자수 기준)
-  const isLong = bio && bio.length > 40
 
   if (!bio) {
     return <div className="bio-content empty-bio" style={{ minHeight: '33.5px' }}></div>
   }
 
-  if (showFull || !isLong) {
+  if (showFull) {
     return (
       <div className="bio-content full" style={{ whiteSpace: 'pre-line' }}>
         {bio}
@@ -18,27 +17,23 @@ function BioContent({ bio }) {
     )
   }
 
-  // bio가 길면 ...만 보이고, 클릭 시 전체 bio 표시
+  // react-lines-ellipsis를 사용해서 2줄 제한
   return (
-    <div
-      className="bio-content clickable"
-      onClick={() => setShowFull(true)}
-      title="전체 보기"
-      style={{ cursor: 'pointer' }}
-    >
-      <span
-        className="bio-truncated"
+    <div className="bio-content clickable" onClick={() => setShowFull(true)} style={{ cursor: 'pointer' }}>
+      <LinesEllipsis
+        text={bio}
+        maxLine={2}
+        ellipsis="..."
+        trimRight={false}
+        basedOn="words"
         style={{
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'pre-line', // 줄바꿈 적용
+          whiteSpace: 'pre-line',
+          wordWrap: 'break-word',
+          fontSize: '14px',
+          lineHeight: '1.2',
+          color: '#191A1C'
         }}
-      >
-        {bio}
-      </span>
+      />
     </div>
   )
 }
