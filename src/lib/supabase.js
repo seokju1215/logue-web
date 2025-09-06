@@ -104,4 +104,22 @@ export const getBookPost = async (userId, bookId) => {
     console.error('책 리뷰 가져오기 실패:', error)
     throw new Error('책 리뷰를 찾을 수 없습니다.')
   }
+}
+
+// 보관된 책들 가져오기 (페이지네이션)
+export const getArchivedBooks = async (userId, limit = 200, offset = 0) => {
+  try {
+    const { data, error } = await supabase
+      .rpc('get_other_user_archived_books_page', {
+        p_user_id: userId,
+        p_limit: limit,
+        p_offset: offset
+      })
+
+    if (error) throw error
+    return data || []
+  } catch (error) {
+    console.error('보관된 책 가져오기 실패:', error)
+    throw new Error('보관된 책을 가져올 수 없습니다.')
+  }
 } 

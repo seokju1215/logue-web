@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { User } from '../components/icons'
-import { getProfileByUsername, getUserBooks } from '../lib/supabase'
+import { getProfileByUsername, getUserBooks, getArchivedBooks } from '../lib/supabase'
 import './ProfilePage.css'
 import BioContent from '../components/BioContent'
 import DownloadDialog from '../components/DownloadDialog'
@@ -13,12 +13,15 @@ function ProfilePage() {
   const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
   const [books, setBooks] = useState([])
+  const [archivedBooks, setArchivedBooks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showAvatarModal, setShowAvatarModal] = useState(false)
   const [showDownloadDialog, setShowDownloadDialog] = useState(false)
   const [imageLoadingStates, setImageLoadingStates] = useState({})
   const [imageErrorStates, setImageErrorStates] = useState({})
+  const [activeTab, setActiveTab] = useState(0) // 0: 대표, 1: 책장
+  const [archivedLoading, setArchivedLoading] = useState(false)
 
   useEffect(() => {
     fetchProfile()
@@ -43,10 +46,15 @@ function ProfilePage() {
       setLoading(true)
       const profileData = await getProfileByUsername(username)
       setProfile(profileData)
-      
+
       // 사용자의 책들 가져오기
       const booksData = await getUserBooks(profileData.id)
       setBooks(booksData)
+
+      // show_archived_books가 true이면 보관된 책들도 가져오기
+      if (profileData.show_archived_books) {
+        await fetchArchivedBooks(profileData.id)
+      }
     } catch (err) {
       setError(err.message)
     } finally {
@@ -54,12 +62,25 @@ function ProfilePage() {
     }
   }
 
-  const handleBookClick = (book) => {
-    // 책 클릭 시 /u/{username}/posts로 이동, bookId는 state로만 전달
-    const bookId = book.book_id || book.id || (book.books && book.books.id)
-    if (bookId && username) {
-      navigate(`/u/${username}/posts`, { state: { bookId } })
+  const fetchArchivedBooks = async (userId) => {
+    try {
+      setArchivedLoading(true)
+      const archivedData = await getArchivedBooks(userId)
+      setArchivedBooks(archivedData)
+    } catch (err) {
+      console.error('보관된 책 가져오기 실패:', err)
+    } finally {
+      setArchivedLoading(false)
     }
+  }
+
+  const handleBookClick = (book) => {
+    // 책 클릭 시 이동 비활성화
+    console.log('책 클릭됨:', book)
+    // const bookId = book.book_id || book.id || (book.books && book.books.id)
+    // if (bookId && username) {
+    //   navigate(`/u/${username}/posts`, { state: { bookId } })
+    // }
   }
 
   // 이미지 URL 안전화 (http -> https)
@@ -93,6 +114,10 @@ function ProfilePage() {
   }
   const handleCloseAvatarModal = () => {
     setShowAvatarModal(false)
+  }
+
+  const handleTabClick = (tabIndex) => {
+    setActiveTab(tabIndex)
   }
 
   if (loading) {
@@ -239,59 +264,216 @@ function ProfilePage() {
 
         {/* 책장 */}
         <section className="books-section">
-          {books.length > 0 ? (
-            <div className="books-grid" style={{ 
-              columnGap: '23px',
-              rowGap: '30px'
-            }}>
-              {books.map((book, index) => {
-                const bookId = book.id
-                const imageUrl = book.books?.image || ''
-                const safeImageUrl = getSafeImageUrl(imageUrl)
-                const isLoading = imageLoadingStates[bookId]
-                const hasError = imageErrorStates[bookId]
+          {/* show_archived_books가 true이면 탭바 표시 */}
+          {profile?.show_archived_books ? (
+            <div className="books-tab-container">
+              {/* 탭바 */}
+              <div className="books-tabs">
+                <button
+                  className={`tab-button ${activeTab === 0 ? 'active' : ''}`}
+                  onClick={() => handleTabClick(0)}
+                >
+                  대표
+                </button>
+                <button
+                  className={`tab-button ${activeTab === 1 ? 'active' : ''}`}
+                  onClick={() => handleTabClick(1)}
+                >
+                  책장
+                </button>
+              </div>
 
-                return (
-                  <div 
-                    key={bookId} 
-                    className="book-item"
-                    onClick={() => handleBookClick(book)}
-                  >
-                    <div className="book-cover">
-                      {safeImageUrl && !hasError ? (
-                        <>
-                          {isLoading && (
-                            <div className="book-loading">
-                              <div className="loading-spinner-small"></div>
+              {/* 탭 내용 */}
+              <div className="tab-content">
+                {activeTab === 0 ? (
+                  // 대표 탭 - 기존 책들
+                  books.length > 0 ? (
+                    <div className="books-grid" style={{ 
+                      columnGap: '23px',
+                      rowGap: '30px'
+                    }}>
+                      {books.map((book, index) => {
+                        const bookId = book.id
+                        const imageUrl = book.books?.image || ''
+                        const safeImageUrl = getSafeImageUrl(imageUrl)
+                        const isLoading = imageLoadingStates[bookId]
+                        const hasError = imageErrorStates[bookId]
+
+                        return (
+                          <div 
+                            key={bookId} 
+                            className="book-item"
+                            onClick={() => handleBookClick(book)}
+                          >
+                            <div className="book-cover">
+                              {safeImageUrl && !hasError ? (
+                                <>
+                                  {isLoading && (
+                                    <div className="book-loading">
+                                      <div className="loading-spinner-small"></div>
+                                    </div>
+                                  )}
+                                  <img 
+                                    src={safeImageUrl} 
+                                    alt={book.books?.title || '책 표지'}
+                                    onLoadStart={() => handleImageLoadStart(bookId)}
+                                    onLoad={() => handleImageLoad(bookId)}
+                                    onError={() => handleImageError(bookId)}
+                                    style={{ 
+                                      display: isLoading ? 'none' : 'block',
+                                      borderRadius: '0 !important',
+                                      border: 'none'
+                                    }}
+                                  />
+                                </>
+                              ) : (
+                                <div className="book-placeholder">
+                                  <span>📚</span>
+                                </div>
+                              )}
                             </div>
-                          )}
-                          <img 
-                            src={safeImageUrl} 
-                            alt={book.books?.title || '책 표지'}
-                            onLoadStart={() => handleImageLoadStart(bookId)}
-                            onLoad={() => handleImageLoad(bookId)}
-                            onError={() => handleImageError(bookId)}
-                            style={{ 
-                              display: isLoading ? 'none' : 'block',
-                              borderRadius: '0 !important',
-                              border: 'none'
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ) : (
+                    <div className="empty-books">
+                      <p>저장된 책이 없습니다.</p>
+                    </div>
+                  )
+                ) : (
+                  // 책장 탭 - 보관된 책들 (5열 그리드)
+                  archivedLoading ? (
+                    <div className="loading-container">
+                      <div className="loading-spinner"></div>
+                      <p>책장을 불러오는 중...</p>
+                    </div>
+                  ) : archivedBooks.length > 0 ? (
+                    <div className="bookshelf-container">
+                      {/* 선반들 */}
+                      <div className="shelves">
+                        {Array.from({ length: Math.ceil(archivedBooks.length / 5) }, (_, rowIndex) => (
+                          <div 
+                            key={rowIndex} 
+                            className="shelf"
+                            style={{
+                              top: `${85 + 103.7 * rowIndex}px`
                             }}
                           />
-                        </>
-                      ) : (
-                        <div className="book-placeholder">
-                          <span>📚</span>
-                        </div>
-                      )}
+                        ))}
+                      </div>
+                      
+                      {/* 책들 */}
+                      <div className="archived-books-grid">
+                        {archivedBooks.map((book, index) => {
+                          const bookId = book.id
+                          const imageUrl = book.books?.image || ''
+                          const safeImageUrl = getSafeImageUrl(imageUrl)
+                          const isLoading = imageLoadingStates[bookId]
+                          const hasError = imageErrorStates[bookId]
+
+                          return (
+                            <div 
+                              key={bookId} 
+                              className="archived-book-item"
+                              onClick={() => handleBookClick(book)}
+                            >
+                              <div className="book-cover">
+                                {safeImageUrl && !hasError ? (
+                                  <>
+                                    {isLoading && (
+                                      <div className="book-loading">
+                                        <div className="loading-spinner-small"></div>
+                                      </div>
+                                    )}
+                                    <img 
+                                      src={safeImageUrl} 
+                                      alt={book.books?.title || '책 표지'}
+                                      onLoadStart={() => handleImageLoadStart(bookId)}
+                                      onLoad={() => handleImageLoad(bookId)}
+                                      onError={() => handleImageError(bookId)}
+                                      style={{ 
+                                        display: isLoading ? 'none' : 'block',
+                                        borderRadius: '0 !important',
+                                        border: 'none'
+                                      }}
+                                    />
+                                  </>
+                                ) : (
+                                  <div className="book-placeholder">
+                                    <span>📚</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
+                  ) : (
+                    <div className="empty-books">
+                      <p>보관된 책이 없습니다.</p>
+                    </div>
+                  )
+                )}
+              </div>
             </div>
           ) : (
-            <div className="empty-books">
-              <p>저장된 책이 없습니다.</p>
-            </div>
+            // show_archived_books가 false이면 기존 책장 표시
+            books.length > 0 ? (
+              <div className="books-grid" style={{ 
+                columnGap: '23px',
+                rowGap: '30px'
+              }}>
+                {books.map((book, index) => {
+                  const bookId = book.id
+                  const imageUrl = book.books?.image || ''
+                  const safeImageUrl = getSafeImageUrl(imageUrl)
+                  const isLoading = imageLoadingStates[bookId]
+                  const hasError = imageErrorStates[bookId]
+
+                  return (
+                    <div 
+                      key={bookId} 
+                      className="book-item"
+                      onClick={() => handleBookClick(book)}
+                    >
+                      <div className="book-cover">
+                        {safeImageUrl && !hasError ? (
+                          <>
+                            {isLoading && (
+                              <div className="book-loading">
+                                <div className="loading-spinner-small"></div>
+                              </div>
+                            )}
+                            <img 
+                              src={safeImageUrl} 
+                              alt={book.books?.title || '책 표지'}
+                              onLoadStart={() => handleImageLoadStart(bookId)}
+                              onLoad={() => handleImageLoad(bookId)}
+                              onError={() => handleImageError(bookId)}
+                              style={{ 
+                                display: isLoading ? 'none' : 'block',
+                                borderRadius: '0 !important',
+                                border: 'none'
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <div className="book-placeholder">
+                            <span>📚</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="empty-books">
+                <p>저장된 책이 없습니다.</p>
+              </div>
+            )
           )}
         </section>
       </main>
