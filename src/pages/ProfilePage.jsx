@@ -189,7 +189,7 @@ function ProfilePage() {
         />
       )}
 
-      <main className="profile-main" style={{ padding: '10px 25px 20px' }}>
+      <main className="profile-main" style={{ padding: '10px 0px 20px' }}>
         {/* 프로필 정보 */}
         <section className="profile-info">
           <div className="profile-details">
