@@ -523,7 +523,7 @@ function ProfilePage() {
                           // CSS Grid의 실제 행 높이 계산 (gap 포함)
                           const rowHeight = itemHeight + gridGap;
                           // 각 행의 책들이 끝나는 지점에 선반 배치
-                          const shelfY = rowHeight * (rowIndex + 1) - 5; // 책 아래 5px
+                          const shelfY = rowHeight * (rowIndex + 1) - 4; // 책 아래 5px
                           
                           // 정수 픽셀 보장
                           const finalShelfY = Math.round(shelfY);
