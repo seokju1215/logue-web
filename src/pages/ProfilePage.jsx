@@ -116,12 +116,16 @@ function ProfilePage() {
   }
 
   const handleBookClick = (book) => {
-    // 책 클릭 시 이동 비활성화
     console.log('책 클릭됨:', book)
-    // const bookId = book.book_id || book.id || (book.books && book.books.id)
-    // if (bookId && username) {
-    //   navigate(`/u/${username}/posts`, { state: { bookId } })
-    // }
+    // 책장 탭에서는 클릭 비활성화
+    if (activeTab === 1) {
+      return
+    }
+    
+    const bookId = book.book_id || book.id || (book.books && book.books.id)
+    if (bookId && username) {
+      navigate(`/u/${username}/posts`, { state: { bookId } })
+    }
   }
 
   // 이미지 URL 안전화 (http -> https)
