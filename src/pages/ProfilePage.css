@@ -317,7 +317,6 @@
 .archived-books-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 35px 11.7px;
   padding: 0 22px;
   position: relative;
   z-index: 2;
@@ -326,7 +325,7 @@
 .archived-book-item {
   cursor: pointer;
   transition: none;
-  aspect-ratio: 98 / 145;
+  aspect-ratio: 98 / 138; /* Flutter와 동일한 비율 */
 }
 
 .archived-book-item:hover {

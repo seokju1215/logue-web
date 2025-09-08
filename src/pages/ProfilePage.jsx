@@ -22,10 +22,44 @@ function ProfilePage() {
   const [imageErrorStates, setImageErrorStates] = useState({})
   const [activeTab, setActiveTab] = useState(0) // 0: 대표, 1: 책장
   const [archivedLoading, setArchivedLoading] = useState(false)
+  const [containerWidth, setContainerWidth] = useState(430) // 기본 너비
 
   useEffect(() => {
     fetchProfile()
   }, [username])
+
+  // 화면 크기 변경 감지
+  useEffect(() => {
+    const updateContainerWidth = () => {
+      const container = document.querySelector('.profile-page')
+      if (container) {
+        setContainerWidth(container.offsetWidth)
+      }
+    }
+
+    // 컴포넌트 마운트 시 즉시 실행
+    updateContainerWidth()
+    
+    // 리사이즈 이벤트 리스너 등록
+    window.addEventListener('resize', updateContainerWidth)
+    
+    return () => window.removeEventListener('resize', updateContainerWidth)
+  }, [])
+
+  // 프로필이 로드된 후에도 컨테이너 너비 업데이트
+  useEffect(() => {
+    if (profile && !loading) {
+      const updateContainerWidth = () => {
+        const container = document.querySelector('.profile-page')
+        if (container) {
+          setContainerWidth(container.offsetWidth)
+        }
+      }
+      
+      // 약간의 지연을 두고 실행 (DOM이 완전히 렌더링된 후)
+      setTimeout(updateContainerWidth, 100)
+    }
+  }, [profile, loading])
 
   // GA 방문자 추적
   useEffect(() => {
@@ -352,19 +386,43 @@ function ProfilePage() {
                     <div className="bookshelf-container">
                       {/* 선반들 */}
                       <div className="shelves">
-                        {Array.from({ length: Math.ceil(archivedBooks.length / 5) }, (_, rowIndex) => (
-                          <div 
-                            key={rowIndex} 
-                            className="shelf"
-                            style={{
-                              top: `${85 + 103.7 * rowIndex}px`
-                            }}
-                          />
-                        ))}
+                        {Array.from({ length: Math.ceil(archivedBooks.length / 5) }, (_, rowIndex) => {
+                          // Flutter의 _buildBookshelfLayout과 동일한 계산
+                          const crossAxisCount = 5;
+                          const crossAxisSpacing = 11.7;
+                          const itemAspectRatio = 98 / 138; // Flutter와 동일
+                          const bookPadding = 22.0;
+                          
+                          // 실제 화면 너비 계산 (동적 너비 - 패딩)
+                          const availableWidth = containerWidth - (bookPadding * 2);
+                          const totalSpacing = crossAxisSpacing * (crossAxisCount - 1);
+                          const itemWidth = (availableWidth - totalSpacing) / crossAxisCount;
+                          const itemHeight = itemWidth / itemAspectRatio;
+                          
+                          // 책과 선반 사이의 간격을 유동적으로 계산 (최소값 증가)
+                          const bookShelfSpacing = Math.max(38, Math.min(60, itemHeight * 0.4));
+                          const firstShelfY = Math.max(50, Math.min(120, itemHeight));
+                          const shelfY = firstShelfY+16 + (itemHeight + bookShelfSpacing-3) * rowIndex;
+                          
+                          return (
+                            <div 
+                              key={rowIndex} 
+                              className="shelf"
+                              style={{
+                                top: `${shelfY}px`
+                              }}
+                            />
+                          );
+                        })}
                       </div>
                       
                       {/* 책들 */}
-                      <div className="archived-books-grid">
+                      <div 
+                        className="archived-books-grid"
+                        style={{
+                          gap: `${Math.max(35, Math.min(60, ((containerWidth - 44) / 5 - 11.7 * 4) / (98/138) * 0.4))}px 11.7px` // 최소값 증가
+                        }}
+                      >
                         {archivedBooks.map((book, index) => {
                           const bookId = book.id
                           const imageUrl = book.books?.image || ''
