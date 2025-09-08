@@ -23,6 +23,11 @@ function ProfilePage() {
   const [activeTab, setActiveTab] = useState(0) // 0: 대표, 1: 책장
   const [archivedLoading, setArchivedLoading] = useState(false)
   const [containerWidth, setContainerWidth] = useState(430) // 기본 너비
+  
+  // 스와이프 관련 상태
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
   useEffect(() => {
     fetchProfile()
@@ -151,7 +156,46 @@ function ProfilePage() {
   }
 
   const handleTabClick = (tabIndex) => {
+    if (isTransitioning) return
     setActiveTab(tabIndex)
+  }
+
+  // 터치 시작
+  const handleTouchStart = (e) => {
+    if (!profile?.show_archived_books) return
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  // 터치 이동
+  const handleTouchMove = (e) => {
+    if (!profile?.show_archived_books) return
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  // 터치 종료 - 스와이프 감지
+  const handleTouchEnd = () => {
+    if (!profile?.show_archived_books || !touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe && activeTab === 0) {
+      // 왼쪽으로 스와이프 - 대표에서 책장으로
+      setIsTransitioning(true)
+      setActiveTab(1)
+      setTimeout(() => setIsTransitioning(false), 300)
+    } else if (isRightSwipe && activeTab === 1) {
+      // 오른쪽으로 스와이프 - 책장에서 대표로
+      setIsTransitioning(true)
+      setActiveTab(0)
+      setTimeout(() => setIsTransitioning(false), 300)
+    }
+    
+    // 터치 상태 초기화
+    setTouchStart(null)
+    setTouchEnd(null)
   }
 
   if (loading) {
@@ -318,7 +362,12 @@ function ProfilePage() {
               </div>
 
               {/* 탭 내용 */}
-              <div className="tab-content">
+              <div 
+                className={`tab-content ${isTransitioning ? 'swiping' : ''}`}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
                 {activeTab === 0 ? (
                   // 대표 탭 - 기존 책들
                   books.length > 0 ? (

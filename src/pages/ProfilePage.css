@@ -245,6 +245,8 @@
   border-bottom: 1px solid #858585;
   margin-bottom: 0;
   height: 30px;
+  position: relative;
+  z-index: 10;
 }
 
 .tab-button {
@@ -279,11 +281,24 @@
   height: 2px;
   background-color: #000000;
   border-radius: 0;
+  transition: all 0.3s ease;
 }
 
 /* 탭 내용 */
 .tab-content {
   width: 100%;
+  overflow: hidden;
+  position: relative;
+  touch-action: pan-x;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  transition: transform 0.3s ease;
+}
+
+.tab-content.swiping {
+  transition: none;
 }
 
 /* 책장 컨테이너 */
