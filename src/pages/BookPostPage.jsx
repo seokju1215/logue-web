@@ -38,7 +38,7 @@ function BookPostPage() {
   }
 
   const handleBack = () => {
-    navigate(`/u/${username}`)
+    navigate(`/${username}`)
   }
 
   if (loading) {

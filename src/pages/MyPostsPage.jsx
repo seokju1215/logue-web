@@ -96,13 +96,13 @@ function MyPostsPage() {
   }, [loading, posts, initialIndex])
 
   const handleBack = () => {
-    navigate(`/u/${username}`, { state: { hasDeleted } })
+      navigate(`/${username}`, { state: { hasDeleted } })
   }
 
   const handleDeleteSuccess = (index) => {
     setPosts(prev => prev.filter((_, i) => i !== index))
     setHasDeleted(true)
-    navigate(`/u/${username}`, { state: { hasDeleted: true } })
+    navigate(`/${username}`, { state: { hasDeleted: true } })
   }
 
   const handleEditSuccess = () => {

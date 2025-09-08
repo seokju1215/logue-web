@@ -10,7 +10,7 @@ function HomePage() {
         </div>
         <div className="info-section">
           <p>앱에서 생성된 프로필 링크로 접속하세요.</p>
-          <p>예: /u/username</p>
+          <p>예: /username</p>
         </div>
       </div>
     </div>

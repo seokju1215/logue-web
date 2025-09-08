@@ -28,7 +28,7 @@ function PostDetailPage() {
 
   const handleProfileClick = () => {
     if (post?.userName) {
-      navigate(`/u/${post.userName}`)
+      navigate(`/${post.userName}`)
     }
   }
 

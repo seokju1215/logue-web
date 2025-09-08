@@ -124,7 +124,7 @@ function ProfilePage() {
     
     const bookId = book.book_id || book.id || (book.books && book.books.id)
     if (bookId && username) {
-      navigate(`/u/${username}/posts`, { state: { bookId } })
+      navigate(`/${username}/posts`, { state: { bookId } })
     }
   }
 

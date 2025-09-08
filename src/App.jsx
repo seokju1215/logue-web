@@ -16,7 +16,6 @@ function App() {
           <Route path="/:username" element={<ProfilePage />} />
           <Route path="/u/:username/book/:bookId" element={<BookPostPage />} />
           <Route path="/:username/book/:bookId" element={<BookPostPage />} />
-          <Route path="/u/:username/posts" element={<MyPostsPage />} />
           <Route path="/:username/posts" element={<MyPostsPage />} />
           <Route path="/post/:postId" element={<PostDetailPage />} />
         </Routes>

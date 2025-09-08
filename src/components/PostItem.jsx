@@ -13,7 +13,7 @@ function PostItem({ post, isMyPost, onDeleteSuccess, onEditSuccess, onTap, onBoo
   const reviewTitle = post.reviewTitle || ''
 
   const handleUserProfileClick = () => {
-    navigate(`/u/${post.userName}`, { 
+    navigate(`/${post.userName}`, { 
       state: { userId: post.userId },
       replace: false
     })
