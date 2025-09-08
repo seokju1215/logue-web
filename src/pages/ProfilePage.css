@@ -372,6 +372,10 @@
   height: 5px;
   background-color: #F6F6F6;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* 보관된 책들 5열 그리드 */

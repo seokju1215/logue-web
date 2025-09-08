@@ -504,39 +504,44 @@ function ProfilePage() {
                       {/* 선반들 */}
                       <div className="shelves">
                         {Array.from({ length: Math.ceil(archivedBooks.length / 5) }, (_, rowIndex) => {
-                          // Flutter의 _buildBookshelfLayout과 동일한 계산
+                          // CSS Grid의 실제 렌더링을 시뮬레이션
                           const crossAxisCount = 5;
-                          const crossAxisSpacing = 11.7;
-                          const itemAspectRatio = 98 / 138; // Flutter와 동일
-                          const bookPadding = 22.0;
+                          const crossAxisSpacing = 12;
+                          const itemAspectRatio = 98 / 138;
+                          const bookPadding = 22;
                           
-                          // iOS에서 안정적인 너비 계산
-                          const safeContainerWidth = Math.max(containerWidth, 320)
+                          // 실제 컨테이너 너비 사용 (최소 너비 조정)
+                          const safeContainerWidth = Math.max(containerWidth, 320);
                           const availableWidth = safeContainerWidth - (bookPadding * 2);
                           const totalSpacing = crossAxisSpacing * (crossAxisCount - 1);
                           const itemWidth = (availableWidth - totalSpacing) / crossAxisCount;
                           const itemHeight = itemWidth / itemAspectRatio;
                           
-                          // iOS에서 더 안정적인 계산
-                          const bookShelfSpacing = Math.max(38.15, Math.min(30, itemHeight * 0.5));
-                          const firstShelfY = Math.max(50, Math.min(120, itemHeight));
-                          const shelfY = firstShelfY+16 + (itemHeight + bookShelfSpacing-3.15) * rowIndex;
+                          // CSS Grid gap과 동일한 계산 (최소 너비 조정)
+                          const gridGap = Math.max(20, Math.min(40, ((Math.max(containerWidth, 300) - 44) / 5 - 12 * 4) / (98/138) * 0.3));
                           
-                          // iOS에서 픽셀 정확도 보장
-                          const roundedShelfY = Math.round(shelfY * 100) / 100
+                          // CSS Grid의 실제 행 높이 계산 (gap 포함)
+                          const rowHeight = itemHeight + gridGap;
+                          // 각 행의 책들이 끝나는 지점에 선반 배치
+                          const shelfY = rowHeight * (rowIndex + 1) - 5; // 책 아래 5px
+                          
+                          // 정수 픽셀 보장
+                          const finalShelfY = Math.round(shelfY);
                           
                           return (
                             <div 
                               key={rowIndex} 
                               className="shelf"
                               style={{
-                                top: `${roundedShelfY}px`,
+                                top: `${finalShelfY}px`,
                                 left: '0',
                                 right: '0',
                                 height: '5px',
                                 backgroundColor: '#F6F6F6',
                                 boxShadow: '0 4px 4px rgba(0, 0, 0, 0.25)',
-                                position: 'absolute'
+                                position: 'absolute',
+                                transform: 'translateZ(0)', // iOS 하드웨어 가속
+                                WebkitTransform: 'translateZ(0)'
                               }}
                             />
                           );
@@ -547,7 +552,7 @@ function ProfilePage() {
                       <div 
                         className="archived-books-grid"
                         style={{
-                          gap: `${Math.max(35, Math.min(60, ((Math.max(containerWidth, 320) - 44) / 5 - 11.7 * 4) / (98/138) * 0.4))}px 11.7px` // iOS 안정화
+                          gap: `${Math.round(Math.max(20, Math.min(40, ((Math.max(containerWidth, 320) - 44) / 5 - 12 * 4) / (98/138) * 0.3)))}px 12px` // 선반과 동일한 간격
                         }}
                       >
                         {archivedBooks.map((book, index) => {
