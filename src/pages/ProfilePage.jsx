@@ -30,6 +30,7 @@ function ProfilePage() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [touchStartY, setTouchStartY] = useState(null)
   const [touchEndY, setTouchEndY] = useState(null)
+  const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
     fetchProfile()
@@ -77,6 +78,21 @@ function ProfilePage() {
       setTimeout(updateContainerWidth, 500)
     }
   }, [profile, loading])
+
+  // 스크롤 이벤트 감지 (책장 탭에서만)
+  useEffect(() => {
+    if (activeTab === 1 && profile?.show_archived_books) {
+      const handleScroll = () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+        setIsScrolled(scrollTop > 100)
+      }
+
+      window.addEventListener('scroll', handleScroll)
+      return () => window.removeEventListener('scroll', handleScroll)
+    } else {
+      setIsScrolled(false)
+    }
+  }, [activeTab, profile?.show_archived_books])
 
   // GA 방문자 추적
   useEffect(() => {
@@ -259,18 +275,16 @@ function ProfilePage() {
 
   return (
     <div className="profile-page">
-      {/* 헤더 - 책장 탭에서는 숨김 */}
-      {activeTab === 0 && (
-        <header className="profile-header" style={{ 
-          padding: '16px 25px',
-          minHeight: '56px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <h1>{profile?.username || '사용자'}</h1>
-        </header>
-      )}
+      {/* 헤더 */}
+      <header className={`profile-header ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`} style={{ 
+        padding: '16px 25px',
+        minHeight: '56px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <h1>{profile?.username || '사용자'}</h1>
+      </header>
 
       {/* 프로필 사진 확대 모달 */}
       {showAvatarModal && (
@@ -304,81 +318,77 @@ function ProfilePage() {
       )}
 
       <main className="profile-main" style={{ padding: '10px 0px 20px' }}>
-        {/* 프로필 정보 - 책장 탭에서는 숨김 */}
-        {activeTab === 0 && (
-          <>
-            <section className="profile-info">
-              <div className="profile-details">
+        {/* 프로필 정보 */}
+        <section className={`profile-info ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`}>
+          <div className="profile-details">
+            <div style={{
+              fontSize: '22px',
+              color: '#1A1A1A', // AppColors.black900
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+            }}>
+              {profile?.name || ''}
+            </div>
+            
+            {/* SizedBox(height: 3) */}
+            <div style={{ height: '3px' }}></div>
+            
+            {/* job이 비어있을 때 */}
+            {(!profile?.job || profile.job === '') && (
+              <div style={{ height: '4px' }}></div>
+            )}
+            
+            {/* job이 있을 때 */}
+            {profile?.job && profile.job !== '' && (
+              <>
                 <div style={{
-                  fontSize: '22px',
-                  color: '#1A1A1A', // AppColors.black900
+                  fontSize: '15px',
+                  color: '#858585', // AppColors.black500
                   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
                 }}>
-                  {profile?.name || ''}
+                  {profile.job}
                 </div>
-                
-                {/* SizedBox(height: 3) */}
-                <div style={{ height: '3px' }}></div>
-                
-                {/* job이 비어있을 때 */}
-                {(!profile?.job || profile.job === '') && (
-                  <div style={{ height: '4px' }}></div>
-                )}
-                
-                {/* job이 있을 때 */}
-                {profile?.job && profile.job !== '' && (
-                  <>
-                    <div style={{
-                      fontSize: '15px',
-                      color: '#858585', // AppColors.black500
-                      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
-                    }}>
-                      {profile.job}
-                    </div>
-                    <div style={{ height: '9px' }}></div>
-                  </>
-                )}
-                
-                <BioContent bio={profile?.bio || ''} />
-                
-                {/* job이 비어있을 때 */}
-                {(!profile?.job || profile.job === '') && (
-                  <>
-                    <div style={{ height: '27.5px' }}></div>
-                  </>
-                )}
-                
                 <div style={{ height: '9px' }}></div>
-              </div>
-              <div className="profile-avatar" onClick={handleAvatarClick}>
-                {profile?.avatar_url && profile.avatar_url !== 'basic' ? (
-                  <img src={profile.avatar_url} alt={profile.name} />
-                ) : (
-                  <img src={basicAvatar} alt="기본 아바타" />
-                )}
-              </div>
-            </section>
+              </>
+            )}
+            
+            <BioContent bio={profile?.bio || ''} />
+            
+            {/* job이 비어있을 때 */}
+            {(!profile?.job || profile.job === '') && (
+              <>
+                <div style={{ height: '27.5px' }}></div>
+              </>
+            )}
+            
+            <div style={{ height: '9px' }}></div>
+          </div>
+          <div className="profile-avatar" onClick={handleAvatarClick}>
+            {profile?.avatar_url && profile.avatar_url !== 'basic' ? (
+              <img src={profile.avatar_url} alt={profile.name} />
+            ) : (
+              <img src={basicAvatar} alt="기본 아바타" />
+            )}
+          </div>
+        </section>
 
-            {/* 팔로워/팔로잉 카운트 */}
-            <section className="follow-stats">
-              <div className="stat-item">
-                <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로워</span>
-                <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.followers || 0}</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로잉</span>
-                <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.following || 0}</span>
-              </div>
-              <button 
-                className="follow-btn-ui" 
-                type="button"
-                onClick={() => setShowDownloadDialog(true)}
-              >
-                팔로우 +
-              </button>
-            </section>
-          </>
-        )}
+        {/* 팔로워/팔로잉 카운트 */}
+        <section className={`follow-stats ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`}>
+          <div className="stat-item">
+            <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로워</span>
+            <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.followers || 0}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로잉</span>
+            <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.following || 0}</span>
+          </div>
+          <button 
+            className="follow-btn-ui" 
+            type="button"
+            onClick={() => setShowDownloadDialog(true)}
+          >
+            팔로우 +
+          </button>
+        </section>
 
         {/* 책장 */}
         <section className="books-section">
