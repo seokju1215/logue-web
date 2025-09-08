@@ -40,7 +40,9 @@ function ProfilePage() {
     const updateContainerWidth = () => {
       const container = document.querySelector('.profile-page')
       if (container) {
-        setContainerWidth(container.offsetWidth)
+        // 모바일에서 정확한 너비 계산을 위해 getBoundingClientRect 사용
+        const rect = container.getBoundingClientRect()
+        setContainerWidth(rect.width)
       }
     }
 
@@ -49,8 +51,12 @@ function ProfilePage() {
     
     // 리사이즈 이벤트 리스너 등록
     window.addEventListener('resize', updateContainerWidth)
+    window.addEventListener('orientationchange', updateContainerWidth)
     
-    return () => window.removeEventListener('resize', updateContainerWidth)
+    return () => {
+      window.removeEventListener('resize', updateContainerWidth)
+      window.removeEventListener('orientationchange', updateContainerWidth)
+    }
   }, [])
 
   // 프로필이 로드된 후에도 컨테이너 너비 업데이트
@@ -59,12 +65,16 @@ function ProfilePage() {
       const updateContainerWidth = () => {
         const container = document.querySelector('.profile-page')
         if (container) {
-          setContainerWidth(container.offsetWidth)
+          // 모바일에서 정확한 너비 계산을 위해 getBoundingClientRect 사용
+          const rect = container.getBoundingClientRect()
+          setContainerWidth(rect.width)
         }
       }
       
       // 약간의 지연을 두고 실행 (DOM이 완전히 렌더링된 후)
       setTimeout(updateContainerWidth, 100)
+      // 모바일에서 추가 지연
+      setTimeout(updateContainerWidth, 500)
     }
   }, [profile, loading])
 
