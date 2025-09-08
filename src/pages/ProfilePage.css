@@ -50,7 +50,7 @@
 
 /* 메인 컨텐츠 */
 .profile-main {
-  padding: 10px 22px 20px;
+  padding: 10px 0px 20px;
 }
 
 /* 프로필 정보 */
@@ -58,6 +58,7 @@
   display: flex;
   gap: 16px;
   align-items: flex-start;
+  padding: 0 25px;
 }
 
 .profile-details {
@@ -168,6 +169,7 @@
   gap: 27px;
   margin-bottom: 20px;
   align-items: center;
+  padding: 0 25px;
 }
 
 .stat-item {
@@ -231,12 +233,189 @@
   margin-top: 20px;
 }
 
+/* 탭바 컨테이너 */
+.books-tab-container {
+  width: 100%;
+  touch-action: pan-x pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 탭바 */
+.books-tabs {
+  display: flex;
+  background-color: white;
+  border-bottom: 1px solid #858585;
+  margin-bottom: 0;
+  height: 30px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button {
+  flex: 1;
+  height: 30px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: normal;
+  color: #858585;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.tab-button:active {
+  outline: none;
+  box-shadow: none;
+}
+
+.tab-button.active {
+  color: #000000;
+  font-weight: bold;
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #000000;
+  border-radius: 0;
+  transition: all 0.3s ease;
+}
+
+/* 탭 내용 */
+.tab-content {
+  width: 100%;
+  overflow: visible;
+  position: relative;
+  touch-action: pan-x pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  transition: transform 0.3s ease;
+}
+
+.tab-content.swiping {
+  transition: none;
+}
+
+/* 책장 컨테이너 */
+.bookshelf-container {
+  position: relative;
+  width: 100%;
+  padding: 16px 0 90px 0;
+}
+
+/* 선반들 */
+.shelves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.shelf {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: #F6F6F6;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* 보관된 책들 5열 그리드 */
+.archived-books-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 0 22px;
+  position: relative;
+  z-index: 2;
+}
+
+.archived-book-item {
+  cursor: pointer;
+  transition: none;
+  aspect-ratio: 98 / 138; /* Flutter와 동일한 비율 */
+}
+
+.archived-book-item:hover {
+  transform: none;
+}
+
+.archived-book-item .book-cover {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 0.5px solid #D1D1D1;
+  border-radius: 0;
+  box-shadow: none;
+  filter: none;
+}
+
+.archived-book-item .book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 0 !important;
+  border: none;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.archived-book-item .book-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #E0E0E0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #9E9E9E;
+  border-radius: 0;
+}
+
+.archived-book-item .book-loading {
+  width: 100%;
+  height: 100%;
+  background-color: #F5F5F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .books-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 1fr;
   gap: 23px;
-  padding: 0;
+  padding: 16px 26px;
   width: 100%;
 }
 
