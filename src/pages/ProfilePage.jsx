@@ -510,12 +510,12 @@ function ProfilePage() {
                           const itemAspectRatio = 98 / 138;
                           const bookPadding = 22;
                           
-                          // 실제 컨테이너 너비 사용 (최소 너비 조정)
-                          const safeContainerWidth = Math.max(containerWidth, 320);
+                          // iOS에서 안정적인 너비 계산
+                          const safeContainerWidth = Math.max(containerWidth, 300);
                           const availableWidth = safeContainerWidth - (bookPadding * 2);
                           const totalSpacing = crossAxisSpacing * (crossAxisCount - 1);
-                          const itemWidth = (availableWidth - totalSpacing) / crossAxisCount;
-                          const itemHeight = itemWidth / itemAspectRatio;
+                          const itemWidth = Math.floor((availableWidth - totalSpacing) / crossAxisCount);
+                          const itemHeight = Math.floor(itemWidth / itemAspectRatio);
                           
                           // CSS Grid gap과 동일한 계산 (최소 너비 조정)
                           const gridGap = Math.max(20, Math.min(40, ((Math.max(containerWidth, 300) - 44) / 5 - 12 * 4) / (98/138) * 0.3));
@@ -523,10 +523,10 @@ function ProfilePage() {
                           // CSS Grid의 실제 행 높이 계산 (gap 포함)
                           const rowHeight = itemHeight + gridGap;
                           // 각 행의 책들이 끝나는 지점에 선반 배치
-                          const shelfY = rowHeight * (rowIndex + 1) - 4; // 책 아래 5px
+                          const shelfY = rowHeight * (rowIndex + 1) - 3; // 책 아래 3px
                           
-                          // 정수 픽셀 보장
-                          const finalShelfY = Math.round(shelfY);
+                          // 자연스러운 픽셀 정렬
+                          const finalShelfY = Math.round(shelfY); // 정수 픽셀로 정렬
                           
                           return (
                             <div 
@@ -541,7 +541,9 @@ function ProfilePage() {
                                 boxShadow: '0 4px 4px rgba(0, 0, 0, 0.25)',
                                 position: 'absolute',
                                 transform: 'translateZ(0)', // iOS 하드웨어 가속
-                                WebkitTransform: 'translateZ(0)'
+                                WebkitTransform: 'translateZ(0)',
+                                WebkitBackfaceVisibility: 'hidden',
+                                backfaceVisibility: 'hidden'
                               }}
                             />
                           );
