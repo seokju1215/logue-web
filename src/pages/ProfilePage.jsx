@@ -178,39 +178,33 @@ function ProfilePage() {
     const currentX = e.targetTouches[0].clientX
     const currentY = e.targetTouches[0].clientY
     
-    // 수직 스크롤이 더 크면 기본 스크롤 동작을 허용
-    if (touchStart && touchStartY) {
-      const deltaX = Math.abs(currentX - touchStart)
-      const deltaY = Math.abs(currentY - touchStartY)
-      
-      // 수직 스크롤이 수평 스와이프보다 크면 이벤트를 막지 않음
-      if (deltaY > deltaX) {
-        return
-      }
-    }
-    
+    // 항상 터치 위치 업데이트
     setTouchEnd(currentX)
     setTouchEndY(currentY)
   }
 
   // 터치 종료 - 스와이프 감지
   const handleTouchEnd = () => {
-    if (!profile?.show_archived_books || !touchStart || !touchEnd) return
+    if (!profile?.show_archived_books || !touchStart || !touchEnd || !touchStartY || !touchEndY) return
     
     const distanceX = touchStart - touchEnd
     const distanceY = touchStartY - touchEndY
-    const isLeftSwipe = distanceX > 50
-    const isRightSwipe = distanceX < -50
+    const isLeftSwipe = distanceX > 30
+    const isRightSwipe = distanceX < -30
+
+    console.log('스와이프 감지:', { distanceX, distanceY, isLeftSwipe, isRightSwipe, activeTab })
 
     // 수평 스와이프만 탭 전환으로 처리 (수직은 스크롤)
-    if (Math.abs(distanceX) > Math.abs(distanceY)) {
+    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 30) {
       if (isLeftSwipe && activeTab === 0) {
         // 왼쪽으로 스와이프 - 대표에서 책장으로
+        console.log('왼쪽 스와이프 - 책장으로 전환')
         setIsTransitioning(true)
         setActiveTab(1)
         setTimeout(() => setIsTransitioning(false), 300)
       } else if (isRightSwipe && activeTab === 1) {
         // 오른쪽으로 스와이프 - 책장에서 대표로
+        console.log('오른쪽 스와이프 - 대표로 전환')
         setIsTransitioning(true)
         setActiveTab(0)
         setTimeout(() => setIsTransitioning(false), 300)
@@ -251,16 +245,18 @@ function ProfilePage() {
 
   return (
     <div className="profile-page">
-      {/* 헤더 */}
-      <header className="profile-header" style={{ 
-        padding: '16px 25px',
-        minHeight: '56px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <h1>{profile?.username || '사용자'}</h1>
-      </header>
+      {/* 헤더 - 책장 탭에서는 숨김 */}
+      {activeTab === 0 && (
+        <header className="profile-header" style={{ 
+          padding: '16px 25px',
+          minHeight: '56px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <h1>{profile?.username || '사용자'}</h1>
+        </header>
+      )}
 
       {/* 프로필 사진 확대 모달 */}
       {showAvatarModal && (
@@ -294,83 +290,92 @@ function ProfilePage() {
       )}
 
       <main className="profile-main" style={{ padding: '10px 0px 20px' }}>
-        {/* 프로필 정보 */}
-        <section className="profile-info">
-          <div className="profile-details">
-            <div style={{
-              fontSize: '22px',
-              color: '#1A1A1A', // AppColors.black900
-              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
-            }}>
-              {profile?.name || ''}
-            </div>
-            
-            {/* SizedBox(height: 3) */}
-            <div style={{ height: '3px' }}></div>
-            
-            {/* job이 비어있을 때 */}
-            {(!profile?.job || profile.job === '') && (
-              <div style={{ height: '4px' }}></div>
-            )}
-            
-            {/* job이 있을 때 */}
-            {profile?.job && profile.job !== '' && (
-              <>
+        {/* 프로필 정보 - 책장 탭에서는 숨김 */}
+        {activeTab === 0 && (
+          <>
+            <section className="profile-info">
+              <div className="profile-details">
                 <div style={{
-                  fontSize: '15px',
-                  color: '#858585', // AppColors.black500
+                  fontSize: '22px',
+                  color: '#1A1A1A', // AppColors.black900
                   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
                 }}>
-                  {profile.job}
+                  {profile?.name || ''}
                 </div>
+                
+                {/* SizedBox(height: 3) */}
+                <div style={{ height: '3px' }}></div>
+                
+                {/* job이 비어있을 때 */}
+                {(!profile?.job || profile.job === '') && (
+                  <div style={{ height: '4px' }}></div>
+                )}
+                
+                {/* job이 있을 때 */}
+                {profile?.job && profile.job !== '' && (
+                  <>
+                    <div style={{
+                      fontSize: '15px',
+                      color: '#858585', // AppColors.black500
+                      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+                    }}>
+                      {profile.job}
+                    </div>
+                    <div style={{ height: '9px' }}></div>
+                  </>
+                )}
+                
+                <BioContent bio={profile?.bio || ''} />
+                
+                {/* job이 비어있을 때 */}
+                {(!profile?.job || profile.job === '') && (
+                  <>
+                    <div style={{ height: '27.5px' }}></div>
+                  </>
+                )}
+                
                 <div style={{ height: '9px' }}></div>
-              </>
-            )}
-            
-            <BioContent bio={profile?.bio || ''} />
-            
-            {/* job이 비어있을 때 */}
-            {(!profile?.job || profile.job === '') && (
-              <>
-                <div style={{ height: '27.5px' }}></div>
-              </>
-            )}
-            
-            <div style={{ height: '9px' }}></div>
-          </div>
-          <div className="profile-avatar" onClick={handleAvatarClick}>
-            {profile?.avatar_url && profile.avatar_url !== 'basic' ? (
-              <img src={profile.avatar_url} alt={profile.name} />
-            ) : (
-              <img src={basicAvatar} alt="기본 아바타" />
-            )}
-          </div>
-        </section>
+              </div>
+              <div className="profile-avatar" onClick={handleAvatarClick}>
+                {profile?.avatar_url && profile.avatar_url !== 'basic' ? (
+                  <img src={profile.avatar_url} alt={profile.name} />
+                ) : (
+                  <img src={basicAvatar} alt="기본 아바타" />
+                )}
+              </div>
+            </section>
 
-        {/* 팔로워/팔로잉 카운트 */}
-        <section className="follow-stats">
-          <div className="stat-item">
-            <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로워</span>
-            <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.followers || 0}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로잉</span>
-            <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.following || 0}</span>
-          </div>
-          <button 
-            className="follow-btn-ui" 
-            type="button"
-            onClick={() => setShowDownloadDialog(true)}
-          >
-            팔로우 +
-          </button>
-        </section>
+            {/* 팔로워/팔로잉 카운트 */}
+            <section className="follow-stats">
+              <div className="stat-item">
+                <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로워</span>
+                <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.followers || 0}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로잉</span>
+                <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.following || 0}</span>
+              </div>
+              <button 
+                className="follow-btn-ui" 
+                type="button"
+                onClick={() => setShowDownloadDialog(true)}
+              >
+                팔로우 +
+              </button>
+            </section>
+          </>
+        )}
 
         {/* 책장 */}
         <section className="books-section">
           {/* show_archived_books가 true이면 탭바 표시 */}
           {profile?.show_archived_books ? (
-            <div className="books-tab-container">
+            <div 
+              className="books-tab-container"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               {/* 탭바 */}
               <div className="books-tabs">
                 <button
@@ -388,12 +393,7 @@ function ProfilePage() {
               </div>
 
               {/* 탭 내용 */}
-              <div 
-                className={`tab-content ${isTransitioning ? 'swiping' : ''}`}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-              >
+              <div className={`tab-content ${isTransitioning ? 'swiping' : ''}`}>
                 {activeTab === 0 ? (
                   // 대표 탭 - 기존 책들
                   books.length > 0 ? (

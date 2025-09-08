@@ -236,6 +236,13 @@
 /* 탭바 컨테이너 */
 .books-tab-container {
   width: 100%;
+  touch-action: pan-x pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* 탭바 */
@@ -245,8 +252,10 @@
   border-bottom: 1px solid #858585;
   margin-bottom: 0;
   height: 30px;
-  position: relative;
-  z-index: 10;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .tab-button {
@@ -265,6 +274,18 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   padding: 0;
   margin: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.tab-button:active {
+  outline: none;
+  box-shadow: none;
 }
 
 .tab-button.active {
