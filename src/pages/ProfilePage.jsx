@@ -400,9 +400,9 @@ function ProfilePage() {
                           const itemHeight = itemWidth / itemAspectRatio;
                           
                           // 책과 선반 사이의 간격을 유동적으로 계산 (최소값 증가)
-                          const bookShelfSpacing = Math.max(38, Math.min(60, itemHeight * 0.4));
+                          const bookShelfSpacing = Math.max(38.15, Math.min(30, itemHeight * 0.5));
                           const firstShelfY = Math.max(50, Math.min(120, itemHeight));
-                          const shelfY = firstShelfY+15 + (itemHeight + bookShelfSpacing-3.55) * rowIndex;
+                          const shelfY = firstShelfY+15 + (itemHeight + bookShelfSpacing-3.15) * rowIndex;
                           
                           return (
                             <div 
