@@ -46,7 +46,7 @@ function ProfilePage() {
       setLoading(true)
       const profileData = await getProfileByUsername(username)
       setProfile(profileData)
-
+      
       // 사용자의 책들 가져오기
       const booksData = await getUserBooks(profileData.id)
       setBooks(booksData)
@@ -425,54 +425,54 @@ function ProfilePage() {
                 columnGap: '23px',
                 rowGap: '30px'
               }}>
-                {books.map((book, index) => {
-                  const bookId = book.id
-                  const imageUrl = book.books?.image || ''
-                  const safeImageUrl = getSafeImageUrl(imageUrl)
-                  const isLoading = imageLoadingStates[bookId]
-                  const hasError = imageErrorStates[bookId]
+              {books.map((book, index) => {
+                const bookId = book.id
+                const imageUrl = book.books?.image || ''
+                const safeImageUrl = getSafeImageUrl(imageUrl)
+                const isLoading = imageLoadingStates[bookId]
+                const hasError = imageErrorStates[bookId]
 
-                  return (
-                    <div 
-                      key={bookId} 
-                      className="book-item"
-                      onClick={() => handleBookClick(book)}
-                    >
-                      <div className="book-cover">
-                        {safeImageUrl && !hasError ? (
-                          <>
-                            {isLoading && (
-                              <div className="book-loading">
-                                <div className="loading-spinner-small"></div>
-                              </div>
-                            )}
-                            <img 
-                              src={safeImageUrl} 
-                              alt={book.books?.title || '책 표지'}
-                              onLoadStart={() => handleImageLoadStart(bookId)}
-                              onLoad={() => handleImageLoad(bookId)}
-                              onError={() => handleImageError(bookId)}
-                              style={{ 
-                                display: isLoading ? 'none' : 'block',
-                                borderRadius: '0 !important',
-                                border: 'none'
-                              }}
-                            />
-                          </>
-                        ) : (
-                          <div className="book-placeholder">
-                            <span>📚</span>
-                          </div>
-                        )}
-                      </div>
+                return (
+                  <div 
+                    key={bookId} 
+                    className="book-item"
+                    onClick={() => handleBookClick(book)}
+                  >
+                    <div className="book-cover">
+                      {safeImageUrl && !hasError ? (
+                        <>
+                          {isLoading && (
+                            <div className="book-loading">
+                              <div className="loading-spinner-small"></div>
+                            </div>
+                          )}
+                          <img 
+                            src={safeImageUrl} 
+                            alt={book.books?.title || '책 표지'}
+                            onLoadStart={() => handleImageLoadStart(bookId)}
+                            onLoad={() => handleImageLoad(bookId)}
+                            onError={() => handleImageError(bookId)}
+                            style={{ 
+                              display: isLoading ? 'none' : 'block',
+                              borderRadius: '0 !important',
+                              border: 'none'
+                            }}
+                          />
+                        </>
+                      ) : (
+                        <div className="book-placeholder">
+                          <span>📚</span>
+                        </div>
+                      )}
                     </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="empty-books">
-                <p>저장된 책이 없습니다.</p>
-              </div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="empty-books">
+              <p>저장된 책이 없습니다.</p>
+            </div>
             )
           )}
         </section>
