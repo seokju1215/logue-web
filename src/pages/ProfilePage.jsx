@@ -41,22 +41,34 @@ function ProfilePage() {
     const updateContainerWidth = () => {
       const container = document.querySelector('.profile-page')
       if (container) {
-        // 모바일에서 정확한 너비 계산을 위해 getBoundingClientRect 사용
+        // iOS에서 정확한 너비 계산을 위해 여러 방법 시도
         const rect = container.getBoundingClientRect()
-        setContainerWidth(rect.width)
+        const computedStyle = window.getComputedStyle(container)
+        const width = rect.width || parseFloat(computedStyle.width) || container.offsetWidth
+        
+        // iOS에서 안정적인 너비 보장
+        const stableWidth = Math.max(width, 320) // 최소 너비 보장
+        setContainerWidth(stableWidth)
       }
     }
 
     // 컴포넌트 마운트 시 즉시 실행
     updateContainerWidth()
     
-    // 리사이즈 이벤트 리스너 등록
+    // iOS에서 추가 이벤트 리스너
     window.addEventListener('resize', updateContainerWidth)
     window.addEventListener('orientationchange', updateContainerWidth)
+    window.addEventListener('load', updateContainerWidth)
+    
+    // iOS Safari에서 DOM이 완전히 로드된 후 실행
+    if (document.readyState === 'complete') {
+      setTimeout(updateContainerWidth, 100)
+    }
     
     return () => {
       window.removeEventListener('resize', updateContainerWidth)
       window.removeEventListener('orientationchange', updateContainerWidth)
+      window.removeEventListener('load', updateContainerWidth)
     }
   }, [])
 
@@ -66,16 +78,22 @@ function ProfilePage() {
       const updateContainerWidth = () => {
         const container = document.querySelector('.profile-page')
         if (container) {
-          // 모바일에서 정확한 너비 계산을 위해 getBoundingClientRect 사용
+          // iOS에서 정확한 너비 계산을 위해 여러 방법 시도
           const rect = container.getBoundingClientRect()
-          setContainerWidth(rect.width)
+          const computedStyle = window.getComputedStyle(container)
+          const width = rect.width || parseFloat(computedStyle.width) || container.offsetWidth
+          
+          // iOS에서 안정적인 너비 보장
+          const stableWidth = Math.max(width, 320) // 최소 너비 보장
+          setContainerWidth(stableWidth)
         }
       }
       
-      // 약간의 지연을 두고 실행 (DOM이 완전히 렌더링된 후)
+      // iOS에서 더 긴 지연 시간 적용
       setTimeout(updateContainerWidth, 100)
-      // 모바일에서 추가 지연
+      setTimeout(updateContainerWidth, 300)
       setTimeout(updateContainerWidth, 500)
+      setTimeout(updateContainerWidth, 1000) // iOS에서 추가 지연
     }
   }, [profile, loading])
 
@@ -492,23 +510,33 @@ function ProfilePage() {
                           const itemAspectRatio = 98 / 138; // Flutter와 동일
                           const bookPadding = 22.0;
                           
-                          // 실제 화면 너비 계산 (동적 너비 - 패딩)
-                          const availableWidth = containerWidth - (bookPadding * 2);
+                          // iOS에서 안정적인 너비 계산
+                          const safeContainerWidth = Math.max(containerWidth, 320)
+                          const availableWidth = safeContainerWidth - (bookPadding * 2);
                           const totalSpacing = crossAxisSpacing * (crossAxisCount - 1);
                           const itemWidth = (availableWidth - totalSpacing) / crossAxisCount;
                           const itemHeight = itemWidth / itemAspectRatio;
                           
-                          // 책과 선반 사이의 간격을 유동적으로 계산 (최소값 증가)
+                          // iOS에서 더 안정적인 계산
                           const bookShelfSpacing = Math.max(38.15, Math.min(30, itemHeight * 0.5));
                           const firstShelfY = Math.max(50, Math.min(120, itemHeight));
                           const shelfY = firstShelfY+16 + (itemHeight + bookShelfSpacing-3.15) * rowIndex;
+                          
+                          // iOS에서 픽셀 정확도 보장
+                          const roundedShelfY = Math.round(shelfY * 100) / 100
                           
                           return (
                             <div 
                               key={rowIndex} 
                               className="shelf"
                               style={{
-                                top: `${shelfY}px`
+                                top: `${roundedShelfY}px`,
+                                left: '0',
+                                right: '0',
+                                height: '5px',
+                                backgroundColor: '#F6F6F6',
+                                boxShadow: '0 4px 4px rgba(0, 0, 0, 0.25)',
+                                position: 'absolute'
                               }}
                             />
                           );
@@ -519,7 +547,7 @@ function ProfilePage() {
                       <div 
                         className="archived-books-grid"
                         style={{
-                          gap: `${Math.max(35, Math.min(60, ((containerWidth - 44) / 5 - 11.7 * 4) / (98/138) * 0.4))}px 11.7px` // 최소값 증가
+                          gap: `${Math.max(35, Math.min(60, ((Math.max(containerWidth, 320) - 44) / 5 - 11.7 * 4) / (98/138) * 0.4))}px 11.7px` // iOS 안정화
                         }}
                       >
                         {archivedBooks.map((book, index) => {

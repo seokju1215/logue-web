@@ -387,6 +387,10 @@
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
 }
 
 .archived-book-item {
