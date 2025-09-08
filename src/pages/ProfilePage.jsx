@@ -28,6 +28,8 @@ function ProfilePage() {
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [touchStartY, setTouchStartY] = useState(null)
+  const [touchEndY, setTouchEndY] = useState(null)
 
   useEffect(() => {
     fetchProfile()
@@ -164,38 +166,62 @@ function ProfilePage() {
   const handleTouchStart = (e) => {
     if (!profile?.show_archived_books) return
     setTouchEnd(null)
+    setTouchEndY(null)
     setTouchStart(e.targetTouches[0].clientX)
+    setTouchStartY(e.targetTouches[0].clientY)
   }
 
   // 터치 이동
   const handleTouchMove = (e) => {
     if (!profile?.show_archived_books) return
-    setTouchEnd(e.targetTouches[0].clientX)
+    
+    const currentX = e.targetTouches[0].clientX
+    const currentY = e.targetTouches[0].clientY
+    
+    // 수직 스크롤이 더 크면 기본 스크롤 동작을 허용
+    if (touchStart && touchStartY) {
+      const deltaX = Math.abs(currentX - touchStart)
+      const deltaY = Math.abs(currentY - touchStartY)
+      
+      // 수직 스크롤이 수평 스와이프보다 크면 이벤트를 막지 않음
+      if (deltaY > deltaX) {
+        return
+      }
+    }
+    
+    setTouchEnd(currentX)
+    setTouchEndY(currentY)
   }
 
   // 터치 종료 - 스와이프 감지
   const handleTouchEnd = () => {
     if (!profile?.show_archived_books || !touchStart || !touchEnd) return
     
-    const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > 50
-    const isRightSwipe = distance < -50
+    const distanceX = touchStart - touchEnd
+    const distanceY = touchStartY - touchEndY
+    const isLeftSwipe = distanceX > 50
+    const isRightSwipe = distanceX < -50
 
-    if (isLeftSwipe && activeTab === 0) {
-      // 왼쪽으로 스와이프 - 대표에서 책장으로
-      setIsTransitioning(true)
-      setActiveTab(1)
-      setTimeout(() => setIsTransitioning(false), 300)
-    } else if (isRightSwipe && activeTab === 1) {
-      // 오른쪽으로 스와이프 - 책장에서 대표로
-      setIsTransitioning(true)
-      setActiveTab(0)
-      setTimeout(() => setIsTransitioning(false), 300)
+    // 수평 스와이프만 탭 전환으로 처리 (수직은 스크롤)
+    if (Math.abs(distanceX) > Math.abs(distanceY)) {
+      if (isLeftSwipe && activeTab === 0) {
+        // 왼쪽으로 스와이프 - 대표에서 책장으로
+        setIsTransitioning(true)
+        setActiveTab(1)
+        setTimeout(() => setIsTransitioning(false), 300)
+      } else if (isRightSwipe && activeTab === 1) {
+        // 오른쪽으로 스와이프 - 책장에서 대표로
+        setIsTransitioning(true)
+        setActiveTab(0)
+        setTimeout(() => setIsTransitioning(false), 300)
+      }
     }
     
     // 터치 상태 초기화
     setTouchStart(null)
     setTouchEnd(null)
+    setTouchStartY(null)
+    setTouchEndY(null)
   }
 
   if (loading) {
