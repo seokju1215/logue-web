@@ -348,7 +348,7 @@ function ProfilePage() {
         right: activeTab === 0 ? 'auto' : 0,
         zIndex: 100,
         backgroundColor: '#ffffff',
-        maxWidth: '600px',
+        maxWidth: '375px',
         margin: '0 auto'
       }}>
         {/* 헤더 */}
@@ -404,7 +404,7 @@ function ProfilePage() {
               </>
             )}
             
-            <div style={{ height: '9px' }}></div>
+            <div style={{ height: '7px' }}></div>
           </div>
           <div className="profile-avatar" onClick={handleAvatarClick}>
             {profile?.avatar_url && profile.avatar_url !== 'basic' ? (
