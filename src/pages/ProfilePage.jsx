@@ -359,7 +359,7 @@ function ProfilePage() {
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          <h1>{profile?.username || '사용자'}</h1>
+          <h1 style={{ fontWeight: 'bold' }}>{profile?.username || '사용자'}</h1>
         </header>
 
         {/* 프로필 정보 */}
