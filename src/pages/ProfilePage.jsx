@@ -567,7 +567,7 @@ function ProfilePage() {
                     </div>
                   ) : (
                     <div className="empty-books">
-                      <p>저장된 책이 없습니다.</p>
+                      <p>인생 책이 없어요.</p>
                     </div>
                   )
                 ) : (
@@ -646,7 +646,7 @@ function ProfilePage() {
                     </div>
                   ) : (
                     <div className="empty-books">
-                      <p>보관된 책이 없습니다.</p>
+                      <p>책장이 비어있어요.</p>
                     </div>
                   )
                 )}
@@ -665,7 +665,6 @@ function ProfilePage() {
                 const safeImageUrl = getSafeImageUrl(imageUrl)
                 const isLoading = imageLoadingStates[bookId]
                 const hasError = imageErrorStates[bookId]
-
                 return (
                   <div 
                     key={bookId} 
