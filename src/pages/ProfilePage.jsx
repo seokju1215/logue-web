@@ -214,10 +214,11 @@ function ProfilePage() {
     const touch = e.touches[0] || e.changedTouches[0]
     if (!touch) return
     
-    setTouchEnd(null)
-    setTouchEndY(null)
+    // 이전 터치 상태 즉시 초기화
     setTouchStart(touch.clientX)
     setTouchStartY(touch.clientY)
+    setTouchEnd(null)
+    setTouchEndY(null)
     
     console.log('터치 시작:', { x: touch.clientX, y: touch.clientY })
   }
@@ -303,11 +304,13 @@ function ProfilePage() {
       }
     }
     
-    // 터치 상태 초기화
-    setTouchStart(null)
-    setTouchEnd(null)
-    setTouchStartY(null)
-    setTouchEndY(null)
+    // 터치 상태 즉시 초기화 (다음 터치를 위해)
+    setTimeout(() => {
+      setTouchStart(null)
+      setTouchEnd(null)
+      setTouchStartY(null)
+      setTouchEndY(null)
+    }, 0)
   }
 
   if (loading) {
