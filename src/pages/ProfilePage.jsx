@@ -253,10 +253,10 @@ function ProfilePage() {
     
     const distanceX = touchStart - touchEnd
     const distanceY = touchStartY - touchEndY
-    const isLeftSwipe = distanceX > 1  // 더 민감한 스와이프 감지
-    const isRightSwipe = distanceX < -1
-    const isUpSwipe = distanceY < -1  // 위로 스와이프: touchStartY < touchEndY (더 민감)
-    const isDownSwipe = distanceY > 1 // 아래로 스와이프: touchStartY > touchEndY (더 민감)
+    const isLeftSwipe = distanceX > 0.1  // 더 민감한 스와이프 감지
+    const isRightSwipe = distanceX < -0.1
+    const isUpSwipe = distanceY < -0.1  // 위로 스와이프: touchStartY < touchEndY (더 민감)
+    const isDownSwipe = distanceY > 0.1 // 아래로 스와이프: touchStartY > touchEndY (더 민감)
 
     console.log('스와이프 감지:', { 
       distanceX, 
@@ -271,7 +271,7 @@ function ProfilePage() {
     })
 
     // 수평 스와이프 - 탭 전환
-    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 1) {
+    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 0.1) {
       if (isLeftSwipe && activeTab === 0) {
         // 왼쪽으로 스와이프 - 대표에서 책장으로
         console.log('왼쪽 스와이프 - 책장으로 전환')
