@@ -359,7 +359,12 @@ function ProfilePage() {
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          <h1>{profile?.username || '사용자'}</h1>
+          <h1 style={{
+            fontWeight: '600',
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            margin: 0,
+            fontSize: '18px'
+          }}>{profile?.username || '사용자'}</h1>
         </header>
 
         {/* 프로필 정보 */}
