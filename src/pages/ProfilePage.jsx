@@ -31,6 +31,8 @@ function ProfilePage() {
   const [touchStartY, setTouchStartY] = useState(null)
   const [touchEndY, setTouchEndY] = useState(null)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [lastScrollY, setLastScrollY] = useState(0)
+  const [scrollDirection, setScrollDirection] = useState('up')
 
   useEffect(() => {
     fetchProfile()
@@ -104,6 +106,34 @@ function ProfilePage() {
     }
   }, [activeTab])
 
+  // 스크롤 이벤트 핸들러 (책장 탭에서만)
+  useEffect(() => {
+    if (activeTab !== 1 || !profile?.show_archived_books) return
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      const direction = currentScrollY > lastScrollY ? 'down' : 'up'
+      
+      setScrollDirection(direction)
+      setLastScrollY(currentScrollY)
+
+      // 스크롤 방향에 따라 헤더 제어
+      if (direction === 'down' && currentScrollY > 100) {
+        // 아래로 스크롤하고 100px 이상 스크롤했을 때 헤더 숨김
+        setIsScrolled(true)
+      } else if (direction === 'up' || currentScrollY <= 50) {
+        // 위로 스크롤하거나 상단 근처에 있을 때 헤더 표시
+        setIsScrolled(false)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [activeTab, lastScrollY, profile?.show_archived_books])
+
   // GA 방문자 추적
   useEffect(() => {
     if (profile && !loading) {
@@ -152,7 +182,6 @@ function ProfilePage() {
   }
 
   const handleBookClick = (book) => {
-    console.log('책 클릭됨:', book)
     // 책장 탭에서는 클릭 비활성화
     if (activeTab === 1) {
       return
@@ -219,8 +248,6 @@ function ProfilePage() {
     setTouchStartY(touch.clientY)
     setTouchEnd(null)
     setTouchEndY(null)
-    
-    console.log('터치 시작:', { x: touch.clientX, y: touch.clientY })
   }
 
   // 터치 이동
@@ -237,8 +264,6 @@ function ProfilePage() {
     // 항상 터치 위치 업데이트
     setTouchEnd(currentX)
     setTouchEndY(currentY)
-    
-    console.log('터치 이동:', { x: currentX, y: currentY })
   }
 
   // 터치 종료 - 스와이프 감지
@@ -256,53 +281,23 @@ function ProfilePage() {
     const distanceY = touchStartY - touchEndY
     const isLeftSwipe = distanceX > 10  // 수평 스와이프는 10px로 설정
     const isRightSwipe = distanceX < -10
-    const isUpSwipe = distanceY < 0  // 위로 스와이프: touchStartY < touchEndY (극도로 민감)
-    const isDownSwipe = distanceY > 0 // 아래로 스와이프: touchStartY > touchEndY (극도로 민감)
-
-    console.log('스와이프 감지:', { 
-      distanceX, 
-      distanceY, 
-      isLeftSwipe, 
-      isRightSwipe, 
-      isUpSwipe, 
-      isDownSwipe, 
-      activeTab,
-      touchStart: { x: touchStart, y: touchStartY },
-      touchEnd: { x: touchEnd, y: touchEndY }
-    })
 
     // 수평 스와이프 - 탭 전환
     if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 10) {
       if (isLeftSwipe && activeTab === 0) {
         // 왼쪽으로 스와이프 - 대표에서 책장으로
-        console.log('왼쪽 스와이프 - 책장으로 전환')
         setIsTransitioning(true)
         setActiveTab(1)
         setTimeout(() => setIsTransitioning(false), 300)
       } else if (isRightSwipe && activeTab === 1) {
         // 오른쪽으로 스와이프 - 책장에서 대표로
-        console.log('오른쪽 스와이프 - 대표로 전환')
         setIsTransitioning(true)
         setActiveTab(0)
         setIsScrolled(false) // 대표 탭으로 전환할 때 헤더 표시
         setTimeout(() => setIsTransitioning(false), 300)
       }
     }
-    // 수직 스와이프 - 헤더 제어 (책장 탭에서만)
-    else if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 0) {
-      if (activeTab === 1) {
-        if (isDownSwipe) {
-          // 아래로 스와이프 - 헤더 숨김
-          console.log('아래로 스와이프 - 헤더 숨김')
-          setIsScrolled(true)
-        } else if (isUpSwipe) {
-          // 위로 스와이프 - 헤더 즉시 표시
-          console.log('위로 스와이프 - 헤더 즉시 표시', '현재 isScrolled:', isScrolled)
-          setIsScrolled(false)
-          console.log('setIsScrolled(false) 호출됨')
-        }
-      }
-    }
+    // 수직 스와이프는 스크롤 이벤트로 처리하므로 제거
     
     // 터치 상태 즉시 초기화 (다음 터치를 위해)
     setTimeout(() => {
@@ -497,11 +492,9 @@ function ProfilePage() {
         <DownloadDialog 
           onClose={() => setShowDownloadDialog(false)}
           onEdit={() => {
-            console.log('Edit clicked')
             setShowDownloadDialog(false)
           }}
           onDelete={() => {
-            console.log('Delete clicked')
             setShowDownloadDialog(false)
           }}
         />
