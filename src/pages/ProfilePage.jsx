@@ -391,7 +391,7 @@ function ProfilePage() {
                 }}>
                   {profile.job}
                 </div>
-                <div style={{ height: '9px' }}></div>
+                <div style={{ height: '7px' }}></div>
               </>
             )}
             
