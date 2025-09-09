@@ -97,20 +97,12 @@ function ProfilePage() {
     }
   }, [profile, loading])
 
-  // 스크롤 이벤트 감지 (책장 탭에서만)
+  // 탭 변경 시 헤더 상태 초기화
   useEffect(() => {
-    if (activeTab === 1 && profile?.show_archived_books) {
-      const handleScroll = () => {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-        setIsScrolled(scrollTop > 100)
-      }
-
-      window.addEventListener('scroll', handleScroll)
-      return () => window.removeEventListener('scroll', handleScroll)
-    } else {
+    if (activeTab === 0) {
       setIsScrolled(false)
     }
-  }, [activeTab, profile?.show_archived_books])
+  }, [activeTab])
 
   // GA 방문자 추적
   useEffect(() => {
@@ -208,6 +200,10 @@ function ProfilePage() {
   const handleTabClick = (tabIndex) => {
     if (isTransitioning) return
     setActiveTab(tabIndex)
+    // 대표 탭으로 전환할 때는 헤더를 항상 표시
+    if (tabIndex === 0) {
+      setIsScrolled(false)
+    }
   }
 
   // 터치 시작
@@ -233,16 +229,18 @@ function ProfilePage() {
 
   // 터치 종료 - 스와이프 감지
   const handleTouchEnd = () => {
-    if (!profile?.show_archived_books || !touchStart || !touchEnd || !touchStartY || !touchEndY) return
+    if (!touchStart || !touchEnd || !touchStartY || !touchEndY) return
     
     const distanceX = touchStart - touchEnd
     const distanceY = touchStartY - touchEndY
     const isLeftSwipe = distanceX > 30
     const isRightSwipe = distanceX < -30
+    const isUpSwipe = distanceY < -30  // 위로 스와이프: touchStartY < touchEndY
+    const isDownSwipe = distanceY > 30 // 아래로 스와이프: touchStartY > touchEndY
 
-    console.log('스와이프 감지:', { distanceX, distanceY, isLeftSwipe, isRightSwipe, activeTab })
+    console.log('스와이프 감지:', { distanceX, distanceY, isLeftSwipe, isRightSwipe, isUpSwipe, isDownSwipe, activeTab })
 
-    // 수평 스와이프만 탭 전환으로 처리 (수직은 스크롤)
+    // 수평 스와이프 - 탭 전환
     if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 30) {
       if (isLeftSwipe && activeTab === 0) {
         // 왼쪽으로 스와이프 - 대표에서 책장으로
@@ -255,7 +253,23 @@ function ProfilePage() {
         console.log('오른쪽 스와이프 - 대표로 전환')
         setIsTransitioning(true)
         setActiveTab(0)
+        setIsScrolled(false) // 대표 탭으로 전환할 때 헤더 표시
         setTimeout(() => setIsTransitioning(false), 300)
+      }
+    }
+    // 수직 스와이프 - 헤더 제어 (책장 탭에서만)
+    else if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 30) {
+      if (activeTab === 1) {
+        if (isDownSwipe) {
+          // 아래로 스와이프 - 헤더 숨김
+          console.log('아래로 스와이프 - 헤더 숨김')
+          setIsScrolled(true)
+        } else if (isUpSwipe) {
+          // 위로 스와이프 - 헤더 즉시 표시
+          console.log('위로 스와이프 - 헤더 즉시 표시', '현재 isScrolled:', isScrolled)
+          setIsScrolled(false)
+          console.log('setIsScrolled(false) 호출됨')
+        }
       }
     }
     
@@ -292,52 +306,36 @@ function ProfilePage() {
     : '/assets/basic_avatar.png'
 
   return (
-    <div className="profile-page">
-      {/* 헤더 */}
-      <header className={`profile-header ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`} style={{ 
-        padding: '16px 25px',
-        minHeight: '56px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
+    <div 
+      className="profile-page"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* 상단 컨테이너 (헤더 + 프로필 정보 + 팔로워/팔로잉) */}
+      <div className={`top-container ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`} style={{
+        position: activeTab === 0 ? 'static' : 'fixed',
+        top: activeTab === 0 ? 'auto' : 0,
+        left: activeTab === 0 ? 'auto' : 0,
+        right: activeTab === 0 ? 'auto' : 0,
+        zIndex: 100,
+        backgroundColor: '#ffffff',
+        maxWidth: '600px',
+        margin: '0 auto'
       }}>
-        <h1>{profile?.username || '사용자'}</h1>
-      </header>
+        {/* 헤더 */}
+        <header className="profile-header" style={{ 
+          padding: '16px 25px',
+          minHeight: '56px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <h1>{profile?.username || '사용자'}</h1>
+        </header>
 
-      {/* 프로필 사진 확대 모달 */}
-      {showAvatarModal && (
-        <div className="avatar-modal" onClick={handleCloseAvatarModal}>
-          <div className="avatar-modal-backdrop" />
-          <div className="avatar-modal-content">
-            <img 
-              src={profile?.avatar_url && profile.avatar_url !== 'basic' ? profile.avatar_url : basicAvatar} 
-              alt="프로필 확대" 
-              width={250} 
-              height={250} 
-              style={{borderRadius: '50%'}} 
-            />
-          </div>
-        </div>
-      )}
-
-      {/* DownloadDialog */}
-      {showDownloadDialog && (
-        <DownloadDialog 
-          onClose={() => setShowDownloadDialog(false)}
-          onEdit={() => {
-            console.log('Edit clicked')
-            setShowDownloadDialog(false)
-          }}
-          onDelete={() => {
-            console.log('Delete clicked')
-            setShowDownloadDialog(false)
-          }}
-        />
-      )}
-
-      <main className="profile-main" style={{ padding: '10px 0px 20px' }}>
         {/* 프로필 정보 */}
-        <section className={`profile-info ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`}>
+        <section className="profile-info">
           <div className="profile-details">
             <div style={{
               fontSize: '22px',
@@ -390,7 +388,7 @@ function ProfilePage() {
         </section>
 
         {/* 팔로워/팔로잉 카운트 */}
-        <section className={`follow-stats ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`}>
+        <section className="follow-stats">
           <div className="stat-item">
             <span className="stat-label" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>팔로워</span>
             <span className="stat-number" onClick={() => setShowDownloadDialog(true)} style={{cursor: 'pointer'}}>{profile?.followers || 0}</span>
@@ -408,32 +406,86 @@ function ProfilePage() {
           </button>
         </section>
 
+        {/* 탭바 (책장 탭에서만 표시) - 헤더와 함께 움직임 */}
+        {profile?.show_archived_books && (
+          <div className="books-tabs">
+            <button
+              className={`tab-button ${activeTab === 0 ? 'active' : ''}`}
+              onClick={() => handleTabClick(0)}
+            >
+              대표
+            </button>
+            <button
+              className={`tab-button ${activeTab === 1 ? 'active' : ''}`}
+              onClick={() => handleTabClick(1)}
+            >
+              책장
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 고정 탭바 (헤더가 숨겨졌을 때만 표시) */}
+      {profile?.show_archived_books && activeTab === 1 && isScrolled && (
+        <div className="books-tabs-fixed">
+          <button
+            className={`tab-button ${activeTab === 0 ? 'active' : ''}`}
+            onClick={() => handleTabClick(0)}
+          >
+            대표
+          </button>
+          <button
+            className={`tab-button ${activeTab === 1 ? 'active' : ''}`}
+            onClick={() => handleTabClick(1)}
+          >
+            책장
+          </button>
+        </div>
+      )}
+
+      {/* 프로필 사진 확대 모달 */}
+      {showAvatarModal && (
+        <div className="avatar-modal" onClick={handleCloseAvatarModal}>
+          <div className="avatar-modal-backdrop" />
+          <div className="avatar-modal-content">
+            <img 
+              src={profile?.avatar_url && profile.avatar_url !== 'basic' ? profile.avatar_url : basicAvatar} 
+              alt="프로필 확대" 
+              width={250} 
+              height={250} 
+              style={{borderRadius: '50%'}} 
+            />
+          </div>
+        </div>
+      )}
+
+      {/* DownloadDialog */}
+      {showDownloadDialog && (
+        <DownloadDialog 
+          onClose={() => setShowDownloadDialog(false)}
+          onEdit={() => {
+            console.log('Edit clicked')
+            setShowDownloadDialog(false)
+          }}
+          onDelete={() => {
+            console.log('Delete clicked')
+            setShowDownloadDialog(false)
+          }}
+        />
+      )}
+
+      <main className="profile-main" style={{ 
+        padding: profile?.show_archived_books 
+          ? (activeTab === 0 ? '0px 0px 20px' : '250px 0px 20px')
+          : '0px 0px 20px',
+        backgroundColor: '#ffffff'
+      }}>
+
         {/* 책장 */}
         <section className="books-section">
           {/* show_archived_books가 true이면 탭바 표시 */}
           {profile?.show_archived_books ? (
-            <div 
-              className="books-tab-container"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              {/* 탭바 */}
-              <div className="books-tabs">
-                <button
-                  className={`tab-button ${activeTab === 0 ? 'active' : ''}`}
-                  onClick={() => handleTabClick(0)}
-                >
-                  대표
-                </button>
-                <button
-                  className={`tab-button ${activeTab === 1 ? 'active' : ''}`}
-                  onClick={() => handleTabClick(1)}
-                >
-                  책장
-                </button>
-              </div>
-
+            <div className="books-tab-container">
               {/* 탭 내용 */}
               <div className={`tab-content ${isTransitioning ? 'swiping' : ''}`}>
                 {activeTab === 0 ? (
