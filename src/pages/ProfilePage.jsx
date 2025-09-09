@@ -253,10 +253,10 @@ function ProfilePage() {
     
     const distanceX = touchStart - touchEnd
     const distanceY = touchStartY - touchEndY
-    const isLeftSwipe = distanceX > 0.1  // 더 민감한 스와이프 감지
-    const isRightSwipe = distanceX < -0.1
-    const isUpSwipe = distanceY < -0.1  // 위로 스와이프: touchStartY < touchEndY (더 민감)
-    const isDownSwipe = distanceY > 0.1 // 아래로 스와이프: touchStartY > touchEndY (더 민감)
+    const isLeftSwipe = distanceX > 10  // 수평 스와이프는 10px로 설정
+    const isRightSwipe = distanceX < -10
+    const isUpSwipe = distanceY < 0  // 위로 스와이프: touchStartY < touchEndY (극도로 민감)
+    const isDownSwipe = distanceY > 0 // 아래로 스와이프: touchStartY > touchEndY (극도로 민감)
 
     console.log('스와이프 감지:', { 
       distanceX, 
@@ -271,7 +271,7 @@ function ProfilePage() {
     })
 
     // 수평 스와이프 - 탭 전환
-    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 0.1) {
+    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 10) {
       if (isLeftSwipe && activeTab === 0) {
         // 왼쪽으로 스와이프 - 대표에서 책장으로
         console.log('왼쪽 스와이프 - 책장으로 전환')
@@ -288,7 +288,7 @@ function ProfilePage() {
       }
     }
     // 수직 스와이프 - 헤더 제어 (책장 탭에서만)
-    else if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 15) {
+    else if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 0) {
       if (activeTab === 1) {
         if (isDownSwipe) {
           // 아래로 스와이프 - 헤더 숨김
