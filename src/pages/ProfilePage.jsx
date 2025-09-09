@@ -348,7 +348,7 @@ function ProfilePage() {
         right: activeTab === 0 ? 'auto' : 0,
         zIndex: 100,
         backgroundColor: '#ffffff',
-        maxWidth: '375px',
+        maxWidth: '600px',
         margin: '0 auto'
       }}>
         {/* 헤더 */}
