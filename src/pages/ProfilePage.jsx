@@ -33,6 +33,7 @@ function ProfilePage() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
   const [scrollDirection, setScrollDirection] = useState('up')
+  const [bioHeight, setBioHeight] = useState(0) // BioContent 높이
 
   useEffect(() => {
     fetchProfile()
@@ -147,6 +148,36 @@ function ProfilePage() {
       }
     }
   }, [profile, username, loading])
+
+  // BioContent 높이 측정
+  useEffect(() => {
+    if (profile && !loading) {
+      const measureBioHeight = () => {
+        const bioElement = document.querySelector('.bio-content')
+        if (bioElement) {
+          const height = bioElement.offsetHeight
+          setBioHeight(height)
+        }
+      }
+      
+      // 초기 측정 (약간의 지연을 두어 DOM이 완전히 렌더링된 후 측정)
+      setTimeout(measureBioHeight, 100)
+      
+      // ResizeObserver로 동적 측정
+      const resizeObserver = new ResizeObserver(() => {
+        setTimeout(measureBioHeight, 50)
+      })
+      
+      const bioElement = document.querySelector('.bio-content')
+      if (bioElement) {
+        resizeObserver.observe(bioElement)
+      }
+      
+      return () => {
+        resizeObserver.disconnect()
+      }
+    }
+  }, [profile, loading])
 
   const fetchProfile = async () => {
     try {
@@ -400,7 +431,9 @@ function ProfilePage() {
               </>
             )}
             
-            <BioContent bio={profile?.bio || ''} />
+            <div className="bio-content">
+              <BioContent bio={profile?.bio || ''} />
+            </div>
             
             {/* job이 비어있을 때 */}
             {(!profile?.job || profile.job === '') && (
@@ -507,7 +540,7 @@ function ProfilePage() {
 
       <main className="profile-main" style={{ 
         padding: profile?.show_archived_books 
-          ? (activeTab === 0 ? '0px 0px 20px' : '250px 0px 20px')
+          ? (activeTab === 0 ? '0px 0px 20px' : `${Math.max(216 + bioHeight, 250)}px 0px 20px`)
           : '0px 0px 20px',
         backgroundColor: '#ffffff'
       }}>
