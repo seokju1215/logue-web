@@ -374,7 +374,7 @@ function ProfilePage() {
             </div>
             
             {/* SizedBox(height: 3) */}
-            <div style={{ height: '2px' }}></div>
+            <div style={{ height: '1px' }}></div>
             
             {/* job이 비어있을 때 */}
             {(!profile?.job || profile.job === '') && (
