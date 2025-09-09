@@ -209,39 +209,69 @@ function ProfilePage() {
   // 터치 시작
   const handleTouchStart = (e) => {
     if (!profile?.show_archived_books) return
+    
+    // iOS에서 터치 이벤트 캡처
+    const touch = e.touches[0] || e.changedTouches[0]
+    if (!touch) return
+    
     setTouchEnd(null)
     setTouchEndY(null)
-    setTouchStart(e.targetTouches[0].clientX)
-    setTouchStartY(e.targetTouches[0].clientY)
+    setTouchStart(touch.clientX)
+    setTouchStartY(touch.clientY)
+    
+    console.log('터치 시작:', { x: touch.clientX, y: touch.clientY })
   }
 
   // 터치 이동
   const handleTouchMove = (e) => {
     if (!profile?.show_archived_books) return
     
-    const currentX = e.targetTouches[0].clientX
-    const currentY = e.targetTouches[0].clientY
+    // iOS에서 터치 이벤트 캡처
+    const touch = e.touches[0] || e.changedTouches[0]
+    if (!touch) return
+    
+    const currentX = touch.clientX
+    const currentY = touch.clientY
     
     // 항상 터치 위치 업데이트
     setTouchEnd(currentX)
     setTouchEndY(currentY)
+    
+    console.log('터치 이동:', { x: currentX, y: currentY })
   }
 
   // 터치 종료 - 스와이프 감지
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e) => {
     if (!touchStart || !touchEnd || !touchStartY || !touchEndY) return
+    
+    // iOS에서 터치 이벤트 캡처
+    const touch = e.touches[0] || e.changedTouches[0]
+    if (touch) {
+      setTouchEnd(touch.clientX)
+      setTouchEndY(touch.clientY)
+    }
     
     const distanceX = touchStart - touchEnd
     const distanceY = touchStartY - touchEndY
-    const isLeftSwipe = distanceX > 30
-    const isRightSwipe = distanceX < -30
-    const isUpSwipe = distanceY < -30  // 위로 스와이프: touchStartY < touchEndY
-    const isDownSwipe = distanceY > 30 // 아래로 스와이프: touchStartY > touchEndY
+    const isLeftSwipe = distanceX > 2  // iOS에서 더 큰 임계값 사용
+    const isRightSwipe = distanceX < -2
+    const isUpSwipe = distanceY < -1  // 위로 스와이프: touchStartY < touchEndY
+    const isDownSwipe = distanceY > 1 // 아래로 스와이프: touchStartY > touchEndY
 
-    console.log('스와이프 감지:', { distanceX, distanceY, isLeftSwipe, isRightSwipe, isUpSwipe, isDownSwipe, activeTab })
+    console.log('스와이프 감지:', { 
+      distanceX, 
+      distanceY, 
+      isLeftSwipe, 
+      isRightSwipe, 
+      isUpSwipe, 
+      isDownSwipe, 
+      activeTab,
+      touchStart: { x: touchStart, y: touchStartY },
+      touchEnd: { x: touchEnd, y: touchEndY }
+    })
 
     // 수평 스와이프 - 탭 전환
-    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 30) {
+    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 50) {
       if (isLeftSwipe && activeTab === 0) {
         // 왼쪽으로 스와이프 - 대표에서 책장으로
         console.log('왼쪽 스와이프 - 책장으로 전환')
@@ -258,7 +288,7 @@ function ProfilePage() {
       }
     }
     // 수직 스와이프 - 헤더 제어 (책장 탭에서만)
-    else if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 30) {
+    else if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 50) {
       if (activeTab === 1) {
         if (isDownSwipe) {
           // 아래로 스와이프 - 헤더 숨김
