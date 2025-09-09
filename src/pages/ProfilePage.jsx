@@ -501,104 +501,68 @@ function ProfilePage() {
                     </div>
                   ) : archivedBooks.length > 0 ? (
                     <div className="bookshelf-container">
-                      {/* 선반들 */}
-                      <div className="shelves">
+                      {/* 책들과 선반을 함께 렌더링 */}
+                      <div className="bookshelf-rows">
                         {Array.from({ length: Math.ceil(archivedBooks.length / 5) }, (_, rowIndex) => {
-                          // CSS Grid의 실제 렌더링을 시뮬레이션
-                          const crossAxisCount = 5;
-                          const crossAxisSpacing = 12;
-                          const itemAspectRatio = 98 / 138;
-                          const bookPadding = 22;
-                          
-                          // iOS에서 안정적인 너비 계산
-                          const safeContainerWidth = Math.max(containerWidth, 300);
-                          const availableWidth = safeContainerWidth - (bookPadding * 2);
-                          const totalSpacing = crossAxisSpacing * (crossAxisCount - 1);
-                          const itemWidth = Math.floor((availableWidth - totalSpacing) / crossAxisCount);
-                          const itemHeight = Math.floor(itemWidth / itemAspectRatio);
-                          
-                          // CSS Grid gap과 동일한 계산 (최소 너비 조정)
-                          const gridGap = Math.max(20, Math.min(40, ((Math.max(containerWidth, 300) - 44) / 5 - 12 * 4) / (98/138) * 0.3));
-                          
-                          // CSS Grid의 실제 행 높이 계산 (gap 포함)
-                          const rowHeight = itemHeight + gridGap;
-                          // 각 행의 책들이 끝나는 지점에 선반 배치
-                          const shelfY = rowHeight * (rowIndex + 1) - 3; // 책 아래 3px
-                          
-                          // 자연스러운 픽셀 정렬
-                          const finalShelfY = Math.round(shelfY); // 정수 픽셀로 정렬
+                          const startIndex = rowIndex * 5;
+                          const endIndex = Math.min(startIndex + 5, archivedBooks.length);
+                          const rowBooks = archivedBooks.slice(startIndex, endIndex);
                           
                           return (
-                            <div 
-                              key={rowIndex} 
-                              className="shelf"
-                              style={{
-                                top: `${finalShelfY}px`,
-                                left: '0',
-                                right: '0',
-                                height: '5px',
-                                backgroundColor: '#F6F6F6',
-                                boxShadow: '0 4px 4px rgba(0, 0, 0, 0.25)',
-                                position: 'absolute',
-                                transform: 'translateZ(0)', // iOS 하드웨어 가속
-                                WebkitTransform: 'translateZ(0)',
-                                WebkitBackfaceVisibility: 'hidden',
-                                backfaceVisibility: 'hidden'
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
-                      
-                      {/* 책들 */}
-                      <div 
-                        className="archived-books-grid"
-                        style={{
-                          gap: `${Math.round(Math.max(20, Math.min(40, ((Math.max(containerWidth, 320) - 44) / 5 - 12 * 4) / (98/138) * 0.3)))}px 12px` // 선반과 동일한 간격
-                        }}
-                      >
-                        {archivedBooks.map((book, index) => {
-                          const bookId = book.id
-                          const imageUrl = book.books?.image || ''
-                          const safeImageUrl = getSafeImageUrl(imageUrl)
-                          const isLoading = imageLoadingStates[bookId]
-                          const hasError = imageErrorStates[bookId]
+                            <div key={rowIndex} className="bookshelf-row">
+                              {/* 책들 */}
+                              <div className="books-row">
+                                {rowBooks.map((book, bookIndex) => {
+                                  const bookId = book.id
+                                  const imageUrl = book.books?.image || ''
+                                  const safeImageUrl = getSafeImageUrl(imageUrl)
+                                  const isLoading = imageLoadingStates[bookId]
+                                  const hasError = imageErrorStates[bookId]
 
-                          return (
-                            <div 
-                              key={bookId} 
-                              className="archived-book-item"
-                              onClick={() => handleBookClick(book)}
-                            >
-                              <div className="book-cover">
-                                {safeImageUrl && !hasError ? (
-                                  <>
-                                    {isLoading && (
-                                      <div className="book-loading">
-                                        <div className="loading-spinner-small"></div>
+                                  return (
+                                    <div 
+                                      key={bookId} 
+                                      className="archived-book-item"
+                                      onClick={() => handleBookClick(book)}
+                                    >
+                                      <div className="book-cover">
+                                        {safeImageUrl && !hasError ? (
+                                          <>
+                                            {isLoading && (
+                                              <div className="book-loading">
+                                                <div className="loading-spinner-small"></div>
+                                              </div>
+                                            )}
+                                            <img 
+                                              src={safeImageUrl} 
+                                              alt={book.books?.title || '책 표지'}
+                                              onLoadStart={() => handleImageLoadStart(bookId)}
+                                              onLoad={() => handleImageLoad(bookId)}
+                                              onError={() => handleImageError(bookId)}
+                                              style={{ 
+                                                display: isLoading ? 'none' : 'block',
+                                                borderRadius: '0 !important',
+                                                border: 'none'
+                                              }}
+                                            />
+                                          </>
+                                        ) : (
+                                          <div className="book-placeholder">
+                                            <span>📚</span>
+                                          </div>
+                                        )}
                                       </div>
-                                    )}
-                                    <img 
-                                      src={safeImageUrl} 
-                                      alt={book.books?.title || '책 표지'}
-                                      onLoadStart={() => handleImageLoadStart(bookId)}
-                                      onLoad={() => handleImageLoad(bookId)}
-                                      onError={() => handleImageError(bookId)}
-                                      style={{ 
-                                        display: isLoading ? 'none' : 'block',
-                                        borderRadius: '0 !important',
-                                        border: 'none'
-                                      }}
-                                    />
-                                  </>
-                                ) : (
-                                  <div className="book-placeholder">
-                                    <span>📚</span>
-                                  </div>
-                                )}
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                              
+                              {/* 선반 */}
+                              <div className="shelf-row">
+                                <div className="shelf"></div>
                               </div>
                             </div>
-                          )
+                          );
                         })}
                       </div>
                     </div>

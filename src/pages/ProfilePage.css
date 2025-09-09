@@ -380,9 +380,79 @@
   -moz-osx-font-smoothing: grayscale;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+  will-change: transform;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-/* 보관된 책들 5열 그리드 */
+/* 책장 행들 */
+.bookshelf-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bookshelf-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.books-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px 12px;
+  padding: 0 22px;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.shelf-row {
+  height: 5px;
+  margin: 0 22px;
+  margin-top: -2px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.shelf-row .shelf {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: #F6F6F6;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  will-change: transform;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 보관된 책들 5열 그리드 (기존 스타일 유지) */
 .archived-books-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -404,6 +474,7 @@
   cursor: pointer;
   transition: none;
   aspect-ratio: 98 / 138; /* Flutter와 동일한 비율 */
+  -webkit-aspect-ratio: 98 / 138; /* iOS Safari 지원 */
 }
 
 .archived-book-item:hover {
