@@ -227,7 +227,7 @@
 
 .stat-number {
   font-size: 13px;
-  color: #666;
+  color: #858585;
   font-weight: 400;
   height: 17px;
 }
@@ -235,7 +235,7 @@
 .stat-label {
   font-size: 13px;
   height: 17px;
-  color: #666;
+  color: #858585;
   font-weight: 400;
 }
 
@@ -247,7 +247,7 @@
   font-size: 13px;
   color: #191A1C;
   background: #fff;
-  border: 1px solid #191A1C;
+  border: 1px solid #858585;
   border-radius: 5px;
   font-weight: 400;
   cursor: pointer;
@@ -264,7 +264,7 @@
 .follow-btn-ui:hover,
 .follow-btn-ui:focus-visible {
   background: #fff;
-  border-color: #191A1C !important;
+  border-color: #858585 !important;
   outline: none !important;
   box-shadow: none !important;
 }
