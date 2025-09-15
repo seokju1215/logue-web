@@ -96,7 +96,7 @@
   align-items: flex-start;
   padding: 0 25px;
   transition: opacity 0.3s ease, transform 0.3s ease;
-  margin-top: 0px;
+  margin-top: 3px;
 }
 
 .profile-info.scrolled {
