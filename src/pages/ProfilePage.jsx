@@ -413,7 +413,7 @@ function ProfilePage() {
            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
            margin: 0,
            fontSize: '16px'
-         }}>{profile?.username || '사용자'}</h1>
+         }}>{profile?.username || '사용자 '}</h1>
        </header>
 
        {/* 헤더 높이만큼 스페이서 */}
