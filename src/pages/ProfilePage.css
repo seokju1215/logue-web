@@ -12,6 +12,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* 고정 헤더 */
+.profile-header {
+  padding-top: env(safe-area-inset-top); /* iOS 노치 대응 */
+}
+
 /* 프로필 헤더 섹션 - NestedScrollView의 SliverToBoxAdapter와 동일 */
 .profile-header-section {
   background-color: #ffffff;
@@ -315,7 +320,7 @@
 /* SliverPersistentHeader pinned: true와 동일한 고정 탭바 */
 .books-tabs.pinned {
   position: fixed;
-  top: 0;
+  top: 56px;
   left: 0;
   right: 0;
   z-index: 200;

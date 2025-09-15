@@ -392,23 +392,35 @@ function ProfilePage() {
     >
       {/* NestedScrollView의 headerSliverBuilder와 동일한 구조 */}
       
-      {/* 1. SliverToBoxAdapter - 프로필 헤더 */}
-      <div className={`profile-header-section ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`}>
-        {/* 헤더 */}
-        <header className="profile-header" style={{ 
-          padding: '16px 25px',
-          minHeight: '56px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <h1 style={{
-            fontWeight: '600',
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-            margin: 0,
-            fontSize: '16px'
-          }}>{profile?.username || '사용자'}</h1>
-        </header>
+       {/* 고정 헤더 */}
+       <header className="profile-header" style={{ 
+         position: 'fixed',
+         top: 0,
+         left: 0,
+         right: 0,
+         zIndex: 1000,
+         padding: '16px 25px',
+         minHeight: '56px',
+         display: 'flex',
+         alignItems: 'center',
+         justifyContent: 'center',
+         backgroundColor: '#ffffff',
+         maxWidth: '600px',
+         margin: '0 auto',
+       }}>
+         <h1 style={{
+           fontWeight: '600',
+           fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+           margin: 0,
+           fontSize: '16px'
+         }}>{profile?.username || '사용자'}</h1>
+       </header>
+
+       {/* 헤더 높이만큼 스페이서 */}
+       <div style={{ height: '56px' }} />
+
+       {/* 1. SliverToBoxAdapter - 프로필 헤더 */}
+       <div className={`profile-header-section ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`}>
 
         {/* 프로필 정보 */}
         <section className="profile-info">
