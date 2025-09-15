@@ -279,10 +279,9 @@ function ProfilePage() {
   const handleTabClick = (tabIndex) => {
     if (isTransitioning) return
     setActiveTab(tabIndex)
-    // 대표 탭으로 전환할 때는 헤더를 항상 표시하고 스크롤을 맨 위로
+    // 대표 탭으로 전환할 때는 헤더를 항상 표시
     if (tabIndex === 0) {
       setIsScrolled(false)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -345,8 +344,6 @@ function ProfilePage() {
         setIsTransitioning(true)
         setActiveTab(0)
         setIsScrolled(false) // 대표 탭으로 전환할 때 헤더 표시
-        // 스크롤을 맨 위로 이동
-        window.scrollTo({ top: 0, behavior: 'smooth' })
         setTimeout(() => setIsTransitioning(false), 300)
       }
     }
