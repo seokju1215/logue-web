@@ -34,6 +34,9 @@ function ProfilePage() {
   const [lastScrollY, setLastScrollY] = useState(0)
   const [scrollDirection, setScrollDirection] = useState('up')
   const [bioHeight, setBioHeight] = useState(0) // BioContent 높이
+  const [headerHeight, setHeaderHeight] = useState(0) // 헤더 높이
+  const [profileHeaderHeight, setProfileHeaderHeight] = useState(0) // 프로필 헤더 높이
+  const [isTabPinned, setIsTabPinned] = useState(false) // 탭바 고정 상태
 
   useEffect(() => {
     fetchProfile()
@@ -107,9 +110,9 @@ function ProfilePage() {
     }
   }, [activeTab])
 
-  // 스크롤 이벤트 핸들러 (책장 탭에서만)
+  // NestedScrollView 스타일 스크롤 이벤트 핸들러 - SliverPersistentHeader pinned: true와 동일
   useEffect(() => {
-    if (activeTab !== 1 || !profile?.show_archived_books) return
+    if (!profile?.show_archived_books) return
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY
@@ -118,13 +121,29 @@ function ProfilePage() {
       setScrollDirection(direction)
       setLastScrollY(currentScrollY)
 
-      // 스크롤 방향에 따라 헤더 제어
-      if (direction === 'down' && currentScrollY > 100) {
-        // 아래로 스크롤하고 100px 이상 스크롤했을 때 헤더 숨김
-        setIsScrolled(true)
-      } else if (direction === 'up' || currentScrollY <= 50) {
-        // 위로 스크롤하거나 상단 근처에 있을 때 헤더 표시
-        setIsScrolled(false)
+      // 프로필 헤더 높이 계산 (헤더 + 프로필 정보 + 팔로워/팔로잉)
+      const profileHeaderElement = document.querySelector('.profile-header-section')
+      if (profileHeaderElement) {
+        const profileHeaderRect = profileHeaderElement.getBoundingClientRect()
+        const profileHeaderHeightValue = profileHeaderRect.height
+        setProfileHeaderHeight(profileHeaderHeightValue)
+        
+        // 탭바가 고정되어야 하는지 확인 (SliverPersistentHeader pinned: true와 동일)
+        const isTabPinned = currentScrollY >= profileHeaderHeightValue - 30 // 30px 여유
+        setIsTabPinned(isTabPinned)
+        
+        // 전체 헤더 높이 계산 (프로필 헤더 + 탭바)
+        const totalHeaderHeight = profileHeaderHeightValue + 30 // 탭바 높이 30px
+        setHeaderHeight(totalHeaderHeight)
+        
+        // 책장 탭에서만 헤더 숨김/표시 로직 적용
+        if (activeTab === 1) {
+          if (direction === 'down' && currentScrollY > totalHeaderHeight) {
+            setIsScrolled(true)
+          } else if (direction === 'up' || currentScrollY <= totalHeaderHeight - 50) {
+            setIsScrolled(false)
+          }
+        }
       }
     }
 
@@ -133,7 +152,7 @@ function ProfilePage() {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [activeTab, lastScrollY, profile?.show_archived_books])
+  }, [activeTab, lastScrollY, profile?.show_archived_books, profileHeaderHeight])
 
   // GA 방문자 추적
   useEffect(() => {
@@ -260,9 +279,10 @@ function ProfilePage() {
   const handleTabClick = (tabIndex) => {
     if (isTransitioning) return
     setActiveTab(tabIndex)
-    // 대표 탭으로 전환할 때는 헤더를 항상 표시
+    // 대표 탭으로 전환할 때는 헤더를 항상 표시하고 스크롤을 맨 위로
     if (tabIndex === 0) {
       setIsScrolled(false)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -325,6 +345,8 @@ function ProfilePage() {
         setIsTransitioning(true)
         setActiveTab(0)
         setIsScrolled(false) // 대표 탭으로 전환할 때 헤더 표시
+        // 스크롤을 맨 위로 이동
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         setTimeout(() => setIsTransitioning(false), 300)
       }
     }
@@ -371,17 +393,10 @@ function ProfilePage() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* 상단 컨테이너 (헤더 + 프로필 정보 + 팔로워/팔로잉) */}
-      <div className={`top-container ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`} style={{
-        position: activeTab === 0 ? 'static' : 'fixed',
-        top: activeTab === 0 ? 'auto' : 0,
-        left: activeTab === 0 ? 'auto' : 0,
-        right: activeTab === 0 ? 'auto' : 0,
-        zIndex: 100,
-        backgroundColor: '#ffffff',
-        maxWidth: '600px',
-        margin: '0 auto'
-      }}>
+      {/* NestedScrollView의 headerSliverBuilder와 동일한 구조 */}
+      
+      {/* 1. SliverToBoxAdapter - 프로필 헤더 */}
+      <div className={`profile-header-section ${activeTab === 1 && isScrolled ? 'scrolled' : ''}`}>
         {/* 헤더 */}
         <header className="profile-header" style={{ 
           padding: '16px 25px',
@@ -471,29 +486,11 @@ function ProfilePage() {
             팔로우 +
           </button>
         </section>
-
-        {/* 탭바 (책장 탭에서만 표시) - 헤더와 함께 움직임 */}
-        {profile?.show_archived_books && (
-          <div className="books-tabs">
-            <button
-              className={`tab-button ${activeTab === 0 ? 'active' : ''}`}
-              onClick={() => handleTabClick(0)}
-            >
-              대표
-            </button>
-            <button
-              className={`tab-button ${activeTab === 1 ? 'active' : ''}`}
-              onClick={() => handleTabClick(1)}
-            >
-              책장
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* 고정 탭바 (헤더가 숨겨졌을 때만 표시) */}
-      {profile?.show_archived_books && activeTab === 1 && isScrolled && (
-        <div className="books-tabs-fixed">
+      {/* 2. SliverPersistentHeader - 탭바 (pinned: true) */}
+      {profile?.show_archived_books && (
+        <div className={`books-tabs ${isTabPinned ? 'pinned' : ''}`}>
           <button
             className={`tab-button ${activeTab === 0 ? 'active' : ''}`}
             onClick={() => handleTabClick(0)}
@@ -508,6 +505,7 @@ function ProfilePage() {
           </button>
         </div>
       )}
+
 
       {/* 프로필 사진 확대 모달 */}
       {showAvatarModal && (
@@ -540,9 +538,10 @@ function ProfilePage() {
 
       <main className="profile-main" style={{ 
         padding: profile?.show_archived_books 
-          ? (activeTab === 0 ? '0px 0px 20px' : `${Math.max(216 + bioHeight, 250)}px 0px 20px`)
+          ? (activeTab === 0 ? '0px 0px 20px' : `${isTabPinned ? 30 : 0}px 0px 20px`)
           : '0px 0px 20px',
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        minHeight: '100vh'
       }}>
 
         {/* 책장 */}
