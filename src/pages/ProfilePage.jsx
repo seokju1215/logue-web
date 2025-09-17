@@ -362,7 +362,7 @@ function ProfilePage() {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
-        <p>프로필을 불러오는 중...</p>
+        <p>   프로필을 불러오는 중...    </p>
       </div>
     )
   }
@@ -370,7 +370,7 @@ function ProfilePage() {
   if (error) {
     return (
       <div className="error-container">
-        <h2>프로필을 찾을 수 없습니다</h2>
+        <h2>    프로필을 찾을 수 없습니다    </h2>
         <p>{error}</p>
         <button onClick={() => navigate('/')} className="back-button">
           홈으로 돌아가기
