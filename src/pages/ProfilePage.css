@@ -381,7 +381,7 @@
 /* 탭 내용 */
 .tab-content {
   width: 100%;
-  overflow: visible;
+  overflow: hidden;
   position: relative;
   touch-action: pan-x pan-y;
   user-select: none;
@@ -394,6 +394,39 @@
 
 .tab-content.swiping {
   transition: none;
+}
+
+/* 탭 콘텐츠 슬라이드 애니메이션을 위한 래퍼 */
+.tab-content-wrapper {
+  display: flex;
+  width: 200%; /* 두 개의 탭을 나란히 배치 */
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.tab-content.swiping .tab-content-wrapper {
+  transition: none;
+}
+
+/* 스와이프 중일 때 transition 비활성화 */
+.tab-content-wrapper.swiping {
+  transition: none !important;
+}
+
+/* 개별 탭 콘텐츠 */
+.tab-panel {
+  width: 50%; /* 각 탭이 전체 너비의 50% */
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* 탭 전환 애니메이션 */
+.tab-content-wrapper.tab-0 {
+  transform: translateX(0%);
+}
+
+.tab-content-wrapper.tab-1 {
+  transform: translateX(-50%);
 }
 
 /* 책장 컨테이너 */

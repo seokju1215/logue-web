@@ -37,6 +37,8 @@ function ProfilePage() {
   const [headerHeight, setHeaderHeight] = useState(0) // 헤더 높이
   const [profileHeaderHeight, setProfileHeaderHeight] = useState(0) // 프로필 헤더 높이
   const [isTabPinned, setIsTabPinned] = useState(false) // 탭바 고정 상태
+  const [swipeProgress, setSwipeProgress] = useState(0) // 스와이프 진행도 (0-1)
+  const [isSwipeActive, setIsSwipeActive] = useState(false) // 스와이프 활성 상태
 
   useEffect(() => {
     fetchProfile()
@@ -298,11 +300,13 @@ function ProfilePage() {
     setTouchStartY(touch.clientY)
     setTouchEnd(null)
     setTouchEndY(null)
+    setSwipeProgress(0)
+    setIsSwipeActive(false)
   }
 
   // 터치 이동
   const handleTouchMove = (e) => {
-    if (!profile?.show_archived_books) return
+    if (!profile?.show_archived_books || !touchStart) return
     
     // iOS에서 터치 이벤트 캡처
     const touch = e.touches[0] || e.changedTouches[0]
@@ -314,6 +318,20 @@ function ProfilePage() {
     // 항상 터치 위치 업데이트
     setTouchEnd(currentX)
     setTouchEndY(currentY)
+    
+    // 수평 스와이프 감지 및 실시간 애니메이션
+    const distanceX = touchStart - currentX
+    const distanceY = touchStartY - currentY
+    
+    // 수평 스와이프가 수직 스크롤보다 클 때만 처리
+    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 5) {
+      setIsSwipeActive(true)
+      
+      // 스와이프 진행도 계산 (0-1)
+      const maxSwipeDistance = 100 // 최대 스와이프 거리
+      const progress = Math.min(Math.abs(distanceX) / maxSwipeDistance, 1)
+      setSwipeProgress(progress)
+    }
   }
 
   // 터치 종료 - 스와이프 감지
@@ -329,25 +347,40 @@ function ProfilePage() {
     
     const distanceX = touchStart - touchEnd
     const distanceY = touchStartY - touchEndY
-    const isLeftSwipe = distanceX > 10  // 수평 스와이프는 10px로 설정
-    const isRightSwipe = distanceX < -10
+    const isLeftSwipe = distanceX > 30  // 스와이프 임계값을 30px로 증가
+    const isRightSwipe = distanceX < -30
 
     // 수평 스와이프 - 탭 전환
-    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 10) {
+    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 30) {
       if (isLeftSwipe && activeTab === 0) {
         // 왼쪽으로 스와이프 - 대표에서 책장으로
         setIsTransitioning(true)
         setActiveTab(1)
-        setTimeout(() => setIsTransitioning(false), 300)
+        setTimeout(() => {
+          setIsTransitioning(false)
+          setIsSwipeActive(false)
+          setSwipeProgress(0)
+        }, 300)
       } else if (isRightSwipe && activeTab === 1) {
         // 오른쪽으로 스와이프 - 책장에서 대표로
         setIsTransitioning(true)
         setActiveTab(0)
         setIsScrolled(false) // 대표 탭으로 전환할 때 헤더 표시
-        setTimeout(() => setIsTransitioning(false), 300)
+        setTimeout(() => {
+          setIsTransitioning(false)
+          setIsSwipeActive(false)
+          setSwipeProgress(0)
+        }, 300)
+      } else {
+        // 스와이프가 충분하지 않으면 원래 위치로 복귀
+        setIsSwipeActive(false)
+        setSwipeProgress(0)
       }
+    } else {
+      // 스와이프가 아니면 상태 초기화
+      setIsSwipeActive(false)
+      setSwipeProgress(0)
     }
-    // 수직 스와이프는 스크롤 이벤트로 처리하므로 제거
     
     // 터치 상태 즉시 초기화 (다음 터치를 위해)
     setTimeout(() => {
@@ -560,142 +593,158 @@ function ProfilePage() {
             <div className="books-tab-container">
               {/* 탭 내용 */}
               <div className={`tab-content ${isTransitioning ? 'swiping' : ''}`}>
-                {activeTab === 0 ? (
-                  // 대표 탭 - 기존 책들
-                  books.length > 0 ? (
-                    <div className="books-grid" style={{ 
-                      columnGap: '23px',
-                      rowGap: '30px'
-                    }}>
-                      {books.map((book, index) => {
-                        const bookId = book.id
-                        const imageUrl = book.books?.image || ''
-                        const safeImageUrl = getSafeImageUrl(imageUrl)
-                        const isLoading = imageLoadingStates[bookId]
-                        const hasError = imageErrorStates[bookId]
+                <div 
+                  className={`tab-content-wrapper tab-${activeTab} ${isSwipeActive ? 'swiping' : ''}`}
+                  style={{
+                    transform: isSwipeActive ? 
+                      (activeTab === 0 && touchStart && touchEnd ? 
+                        `translateX(${Math.max(-50, (touchEnd - touchStart) / window.innerWidth * 50)}%)` :
+                        activeTab === 1 && touchStart && touchEnd ?
+                        `translateX(${Math.min(0, -50 + (touchEnd - touchStart) / window.innerWidth * 50)}%)` :
+                        `translateX(${activeTab === 0 ? '0%' : '-50%'})`
+                      ) : 
+                      `translateX(${activeTab === 0 ? '0%' : '-50%'})`
+                  }}
+                >
+                  {/* 대표 탭 */}
+                  <div className="tab-panel">
+                    {books.length > 0 ? (
+                      <div className="books-grid" style={{ 
+                        columnGap: '23px',
+                        rowGap: '30px'
+                      }}>
+                        {books.map((book, index) => {
+                          const bookId = book.id
+                          const imageUrl = book.books?.image || ''
+                          const safeImageUrl = getSafeImageUrl(imageUrl)
+                          const isLoading = imageLoadingStates[bookId]
+                          const hasError = imageErrorStates[bookId]
 
-                        return (
-                          <div 
-                            key={bookId} 
-                            className="book-item"
-                            onClick={() => handleBookClick(book)}
-                          >
-                            <div className="book-cover">
-                              {safeImageUrl && !hasError ? (
-                                <>
-                                  {isLoading && (
-                                    <div className="book-loading">
-                                      <div className="loading-spinner-small"></div>
-                                    </div>
-                                  )}
-                                  <img 
-                                    src={safeImageUrl} 
-                                    alt={book.books?.title || '책 표지'}
-                                    onLoadStart={() => handleImageLoadStart(bookId)}
-                                    onLoad={() => handleImageLoad(bookId)}
-                                    onError={() => handleImageError(bookId)}
-                                    style={{ 
-                                      display: isLoading ? 'none' : 'block',
-                                      borderRadius: '0 !important',
-                                      border: 'none'
-                                    }}
-                                  />
-                                </>
-                              ) : (
-                                <div className="book-placeholder">
-                                  <span>📚</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  ) : (
-                    <div className="empty-books">
-                      <p>인생 책이 없어요.</p>
-                    </div>
-                  )
-                ) : (
-                  // 책장 탭 - 보관된 책들 (5열 그리드)
-                  archivedLoading ? (
-                    <div className="loading-container">
-                      <div className="loading-spinner"></div>
-                      <p>책장을 불러오는 중...</p>
-                    </div>
-                  ) : archivedBooks.length > 0 ? (
-                    <div className="bookshelf-container">
-                      {/* 책들과 선반을 함께 렌더링 */}
-                      <div className="bookshelf-rows">
-                        {Array.from({ length: Math.ceil(archivedBooks.length / 5) }, (_, rowIndex) => {
-                          const startIndex = rowIndex * 5;
-                          const endIndex = Math.min(startIndex + 5, archivedBooks.length);
-                          const rowBooks = archivedBooks.slice(startIndex, endIndex);
-                          
                           return (
-                            <div key={rowIndex} className="bookshelf-row">
-                              {/* 책들 */}
-                              <div className="books-row">
-                                {rowBooks.map((book, bookIndex) => {
-                                  const bookId = book.id
-                                  const imageUrl = book.books?.image || ''
-                                  const safeImageUrl = getSafeImageUrl(imageUrl)
-                                  const isLoading = imageLoadingStates[bookId]
-                                  const hasError = imageErrorStates[bookId]
-
-                                  return (
-                                    <div 
-                                      key={bookId} 
-                                      className="archived-book-item"
-                                      onClick={() => handleBookClick(book)}
-                                    >
-                                      <div className="book-cover">
-                                        {safeImageUrl && !hasError ? (
-                                          <>
-                                            {isLoading && (
-                                              <div className="book-loading">
-                                                <div className="loading-spinner-small"></div>
-                                              </div>
-                                            )}
-                                            <img 
-                                              src={safeImageUrl} 
-                                              alt={book.books?.title || '책 표지'}
-                                              onLoadStart={() => handleImageLoadStart(bookId)}
-                                              onLoad={() => handleImageLoad(bookId)}
-                                              onError={() => handleImageError(bookId)}
-                                              style={{ 
-                                                display: isLoading ? 'none' : 'block',
-                                                borderRadius: '0 !important',
-                                                border: 'none'
-                                              }}
-                                            />
-                                          </>
-                                        ) : (
-                                          <div className="book-placeholder">
-                                            <span>📚</span>
-                                          </div>
-                                        )}
+                            <div 
+                              key={bookId} 
+                              className="book-item"
+                              onClick={() => handleBookClick(book)}
+                            >
+                              <div className="book-cover">
+                                {safeImageUrl && !hasError ? (
+                                  <>
+                                    {isLoading && (
+                                      <div className="book-loading">
+                                        <div className="loading-spinner-small"></div>
                                       </div>
-                                    </div>
-                                  )
-                                })}
-                              </div>
-                              
-                              {/* 선반 */}
-                              <div className="shelf-row">
-                                <div className="shelf"></div>
+                                    )}
+                                    <img 
+                                      src={safeImageUrl} 
+                                      alt={book.books?.title || '책 표지'}
+                                      onLoadStart={() => handleImageLoadStart(bookId)}
+                                      onLoad={() => handleImageLoad(bookId)}
+                                      onError={() => handleImageError(bookId)}
+                                      style={{ 
+                                        display: isLoading ? 'none' : 'block',
+                                        borderRadius: '0 !important',
+                                        border: 'none'
+                                      }}
+                                    />
+                                  </>
+                                ) : (
+                                  <div className="book-placeholder">
+                                    <span>📚</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
-                          );
+                          )
                         })}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="empty-books">
-                      <p>책장이 비어있어요.</p>
-                    </div>
-                  )
-                )}
+                    ) : (
+                      <div className="empty-books">
+                        <p>인생 책이 없어요.</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* 책장 탭 */}
+                  <div className="tab-panel">
+                    {archivedLoading ? (
+                      <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p>책장을 불러오는 중...</p>
+                      </div>
+                    ) : archivedBooks.length > 0 ? (
+                      <div className="bookshelf-container">
+                        {/* 책들과 선반을 함께 렌더링 */}
+                        <div className="bookshelf-rows">
+                          {Array.from({ length: Math.ceil(archivedBooks.length / 5) }, (_, rowIndex) => {
+                            const startIndex = rowIndex * 5;
+                            const endIndex = Math.min(startIndex + 5, archivedBooks.length);
+                            const rowBooks = archivedBooks.slice(startIndex, endIndex);
+                            
+                            return (
+                              <div key={rowIndex} className="bookshelf-row">
+                                {/* 책들 */}
+                                <div className="books-row">
+                                  {rowBooks.map((book, bookIndex) => {
+                                    const bookId = book.id
+                                    const imageUrl = book.books?.image || ''
+                                    const safeImageUrl = getSafeImageUrl(imageUrl)
+                                    const isLoading = imageLoadingStates[bookId]
+                                    const hasError = imageErrorStates[bookId]
+
+                                    return (
+                                      <div 
+                                        key={bookId} 
+                                        className="archived-book-item"
+                                        onClick={() => handleBookClick(book)}
+                                      >
+                                        <div className="book-cover">
+                                          {safeImageUrl && !hasError ? (
+                                            <>
+                                              {isLoading && (
+                                                <div className="book-loading">
+                                                  <div className="loading-spinner-small"></div>
+                                                </div>
+                                              )}
+                                              <img 
+                                                src={safeImageUrl} 
+                                                alt={book.books?.title || '책 표지'}
+                                                onLoadStart={() => handleImageLoadStart(bookId)}
+                                                onLoad={() => handleImageLoad(bookId)}
+                                                onError={() => handleImageError(bookId)}
+                                                style={{ 
+                                                  display: isLoading ? 'none' : 'block',
+                                                  borderRadius: '0 !important',
+                                                  border: 'none'
+                                                }}
+                                              />
+                                            </>
+                                          ) : (
+                                            <div className="book-placeholder">
+                                              <span>📚</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                                
+                                {/* 선반 */}
+                                <div className="shelf-row">
+                                  <div className="shelf"></div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="empty-books">
+                        <p>책장이 비어있어요.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
