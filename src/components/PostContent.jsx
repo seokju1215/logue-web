@@ -38,6 +38,10 @@ function PostContent({ post, onTapMore }) {
     }
   }
 
+  // 200자 이상일 때만 200자로 제한 및 더보기 표시
+  const shouldShowMore = post.reviewContent && post.reviewContent.length > 200
+  const displayText = shouldShowMore ? post.reviewContent.substring(0, 200) : post.reviewContent
+
   return (
     <div style={{ 
       fontSize: '14px', 
@@ -46,31 +50,30 @@ function PostContent({ post, onTapMore }) {
       letterSpacing: '-0.32px', 
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif' 
     }}>
-      <LinesEllipsis
-        text={post.reviewContent}
-        maxLine={5}
-        ellipsis="... "
-        trimRight={false}
-        basedOn="words"
-        component="span"
-        style={{
-          whiteSpace: 'pre-line',
-          wordWrap: 'break-word'
-        }}
-      />
-      <span
-        onClick={handleMoreClick}
-        style={{
-          fontSize: '14px',
-          color: '#858585',
-          lineHeight: '1',
-          letterSpacing: '-0.32px',
-          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-          cursor: 'pointer'
-        }}
-      >
-        더보기
+      <span style={{
+        whiteSpace: 'pre-line',
+        wordWrap: 'break-word'
+      }}>
+        {displayText}
       </span>
+      {shouldShowMore && (
+        <>
+          <span>...</span>
+          <span
+            onClick={handleMoreClick}
+            style={{
+              fontSize: '14px',
+              color: '#858585',
+              lineHeight: '1',
+              letterSpacing: '-0.32px',
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+              cursor: 'pointer'
+            }}
+          >
+            더보기
+          </span>
+        </>
+      )}
     </div>
   )
 }
