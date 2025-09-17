@@ -324,11 +324,11 @@ function ProfilePage() {
     const distanceY = touchStartY - currentY
     
     // 수평 스와이프가 수직 스크롤보다 클 때만 처리
-    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 5) {
+    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 15) {
       setIsSwipeActive(true)
       
       // 스와이프 진행도 계산 (0-1)
-      const maxSwipeDistance = 100 // 최대 스와이프 거리
+      const maxSwipeDistance = 150 // 최대 스와이프 거리
       const progress = Math.min(Math.abs(distanceX) / maxSwipeDistance, 1)
       setSwipeProgress(progress)
     }
@@ -347,11 +347,11 @@ function ProfilePage() {
     
     const distanceX = touchStart - touchEnd
     const distanceY = touchStartY - touchEndY
-    const isLeftSwipe = distanceX > 30  // 스와이프 임계값을 30px로 증가
-    const isRightSwipe = distanceX < -30
+    const isLeftSwipe = distanceX > 50  // 스와이프 임계값을 50px로 증가
+    const isRightSwipe = distanceX < -50
 
     // 수평 스와이프 - 탭 전환
-    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 30) {
+    if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 50) {
       if (isLeftSwipe && activeTab === 0) {
         // 왼쪽으로 스와이프 - 대표에서 책장으로
         setIsTransitioning(true)

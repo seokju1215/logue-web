@@ -164,7 +164,7 @@ function MyPostsPage() {
       <header style={{ 
         display: 'flex', 
         alignItems: 'center', 
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         padding: '16px 22px',
         minHeight: '56px',
         backgroundColor: '#ffffff',
@@ -183,13 +183,12 @@ function MyPostsPage() {
           color: '#1a1a1a',
           borderRadius: '4px',
           transition: 'background-color 0.2s',
-          marginLeft: '-4px'
+          position: 'absolute',
+          left: '22px'
         }}>
           <img src="/back_arrow.svg" alt="뒤로가기" width="20" height="20" />
         </button>
         <h1 style={{ 
-          flex: 1, 
-          textAlign: 'center',
           fontSize: '16px',
           fontWeight: '600',
           color: '#1a1a1a',
@@ -197,7 +196,6 @@ function MyPostsPage() {
         }}>
           {appBarTitle}
         </h1>
-        <div style={{ width: '36px' }}></div>
       </header>
 
       {/* DownloadDialog */}
