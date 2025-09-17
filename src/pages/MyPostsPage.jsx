@@ -191,7 +191,7 @@ function MyPostsPage() {
           flex: 1, 
           textAlign: 'center',
           fontSize: '16px',
-          fontWeight: '500',
+          fontWeight: '600',
           color: '#1a1a1a',
           margin: 0
         }}>
