@@ -78,17 +78,23 @@ function PostDetailPage() {
     <div className="post-detail-page">
       {/* AppBar */}
       <header style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        padding: '16px 22px',
-        minHeight: '56px',
-        backgroundColor: '#ffffff',
-        position: 'sticky',
+        position: 'fixed',
         top: 0,
-        zIndex: 100
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        padding: '16px 25px',
+        minHeight: '56px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#ffffff',
+        maxWidth: '600px',
+        margin: '0 auto',
       }}>
         <button onClick={handleBack} style={{
+          position: 'absolute',
+          left: '25px',
           background: 'none',
           border: 'none',
           padding: '4px',
@@ -99,21 +105,17 @@ function PostDetailPage() {
           color: '#1a1a1a',
           borderRadius: '4px',
           transition: 'background-color 0.2s',
-          marginLeft: '-4px'
         }}>
           <img src="/back_arrow.svg" alt="뒤로가기" width="20" height="20" />
         </button>
-        <h1 style={{ 
-          flex: 1, 
-          textAlign: 'center',
-          fontSize: '16px',
-          fontWeight: '500',
-          color: '#1a1a1a',
-          margin: 0
+        <h1 style={{
+          fontWeight: '600',
+          fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          margin: 0,
+          fontSize: '16px'
         }}>
           {userName}
         </h1>
-        <div style={{ width: '36px' }}></div>
       </header>
 
       {/* DownloadDialog */}
