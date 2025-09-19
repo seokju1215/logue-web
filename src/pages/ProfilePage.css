@@ -420,6 +420,18 @@
   overflow: hidden;
 }
 
+/* 대표탭 - 화면 높이만큼만, 스크롤 없음 */
+.tab-panel.representative-tab {
+  height: 100vh;
+  overflow: visible;
+}
+
+/* 책장탭 - 스크롤 허용 */
+.tab-panel.bookshelf-tab {
+  height: 100vh;
+  overflow: auto;
+}
+
 /* 탭 전환 애니메이션 */
 .tab-content-wrapper.tab-0 {
   transform: translateX(0%);

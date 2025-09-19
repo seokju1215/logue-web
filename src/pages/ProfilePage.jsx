@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { User } from '../components/icons'
 import { getProfileByUsername, getUserBooks, getArchivedBooks } from '../lib/supabase'
@@ -39,6 +39,7 @@ function ProfilePage() {
   const [isTabPinned, setIsTabPinned] = useState(false) // 탭바 고정 상태
   const [swipeProgress, setSwipeProgress] = useState(0) // 스와이프 진행도 (0-1)
   const [isSwipeActive, setIsSwipeActive] = useState(false) // 스와이프 활성 상태
+  const bookshelfTabRef = useRef(null) // 책장탭 ref
 
   useEffect(() => {
     fetchProfile()
@@ -138,12 +139,50 @@ function ProfilePage() {
         const totalHeaderHeight = profileHeaderHeightValue + 30 // 탭바 높이 30px
         setHeaderHeight(totalHeaderHeight)
         
-        // 책장 탭에서만 헤더 숨김/표시 로직 적용
-        if (activeTab === 1) {
-          if (direction === 'down' && currentScrollY > totalHeaderHeight) {
+        // 프로필 헤더 섹션 숨김/표시 로직 적용
+        if (direction === 'down' && currentScrollY > totalHeaderHeight) {
+          setIsScrolled(true)
+          // profile-header-section에 scrolled 클래스 추가
+          profileHeaderElement.classList.add('scrolled')
+        } else if (direction === 'up' || currentScrollY <= totalHeaderHeight - 50) {
+          setIsScrolled(false)
+          // profile-header-section에서 scrolled 클래스 제거
+          profileHeaderElement.classList.remove('scrolled')
+        }
+      }
+    }
+
+    // 책장탭의 스크롤 이벤트 핸들러
+    const handleBookshelfScroll = (e) => {
+      if (activeTab === 1) {
+        const scrollTop = e.target.scrollTop
+        const direction = scrollTop > lastScrollY ? 'down' : 'up'
+        
+        setScrollDirection(direction)
+        setLastScrollY(scrollTop)
+        
+        // 프로필 헤더 높이 계산
+        const profileHeaderElement = document.querySelector('.profile-header-section')
+        if (profileHeaderElement) {
+          const profileHeaderRect = profileHeaderElement.getBoundingClientRect()
+          const profileHeaderHeightValue = profileHeaderRect.height
+          
+          // 대표탭과 동일한 로직 사용 - 책장탭의 스크롤 위치를 프로필 헤더 높이와 비교
+          const isTabPinned = scrollTop >= profileHeaderHeightValue - 30
+          setIsTabPinned(isTabPinned)
+          
+          // 전체 헤더 높이 계산 (프로필 헤더 + 탭바)
+          const totalHeaderHeight = profileHeaderHeightValue + 30 // 탭바 높이 30px
+          
+          // 헤더 숨김/표시 로직 - 대표탭과 동일
+          if (direction === 'down' && scrollTop > totalHeaderHeight) {
             setIsScrolled(true)
-          } else if (direction === 'up' || currentScrollY <= totalHeaderHeight - 50) {
+            // profile-header-section에 scrolled 클래스 추가
+            profileHeaderElement.classList.add('scrolled')
+          } else if (direction === 'up' || scrollTop <= totalHeaderHeight - 50) {
             setIsScrolled(false)
+            // profile-header-section에서 scrolled 클래스 제거
+            profileHeaderElement.classList.remove('scrolled')
           }
         }
       }
@@ -151,10 +190,19 @@ function ProfilePage() {
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     
+    // 책장탭의 스크롤 이벤트 리스너 추가
+    const bookshelfTab = bookshelfTabRef.current
+    if (bookshelfTab) {
+      bookshelfTab.addEventListener('scroll', handleBookshelfScroll, { passive: true })
+    }
+    
     return () => {
       window.removeEventListener('scroll', handleScroll)
+      if (bookshelfTab) {
+        bookshelfTab.removeEventListener('scroll', handleBookshelfScroll)
+      }
     }
-  }, [activeTab, lastScrollY, profile?.show_archived_books, profileHeaderHeight])
+  }, [activeTab, lastScrollY, profile?.show_archived_books, profileHeaderHeight, bookshelfTabRef])
 
   // GA 방문자 추적
   useEffect(() => {
@@ -607,7 +655,7 @@ function ProfilePage() {
                   }}
                 >
                   {/* 대표 탭 */}
-                  <div className="tab-panel">
+                  <div className="tab-panel representative-tab">
                     {books.length > 0 ? (
                       <div className="books-grid" style={{ 
                         columnGap: '23px',
@@ -665,7 +713,7 @@ function ProfilePage() {
                   </div>
                   
                   {/* 책장 탭 */}
-                  <div className="tab-panel">
+                  <div className="tab-panel bookshelf-tab" ref={bookshelfTabRef}>
                     {archivedLoading ? (
                       <div className="loading-container">
                         <div className="loading-spinner"></div>
