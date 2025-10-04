@@ -257,7 +257,7 @@ const BookDetailPage = () => {
               className="aladin-link"
               onClick={() => launchAladinLink(book.link)}
             >
-              알라딘에서 보기 >
+              알라딘에서 보기 &gt;
             </button>
           </div>
           <div className="book-cover">
@@ -408,12 +408,11 @@ const ExpandableText = ({ title, content, maxLines, expanded, onToggle }) => {
         <p 
           className="expandable-text-content"
           style={{
-            display: expanded ? 'block' : '-webkit-box',
-            WebkitLineClamp: expanded ? 'none' : maxLines,
-            WebkitBoxOrient: 'vertical',
+            display: 'block',
             overflow: expanded ? 'visible' : 'hidden',
-            whiteSpace: expanded ? 'pre-wrap' : 'normal',
-            wordBreak: 'keep-all'
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'keep-all',
+            maxHeight: expanded ? 'none' : `${maxLines * 2 * 14}px` // line-height: 2, font-size: 14px
           }}
         >
           {content}

@@ -22,7 +22,6 @@
   padding: 0 25px;
   max-width: 600px;
   margin: 0 auto;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 .back-button {
@@ -126,6 +125,7 @@
 .section-header h3 {
   font-size: 15px;
   color: #1a1a1a;
+  font-weight: 400;
   margin: 0;
 }
 
@@ -210,7 +210,8 @@
 .divider {
   height: 1px;
   background-color: #e0e0e0;
-  margin: 0 22px;
+  margin: 0;
+  width: 100%;
 }
 
 /* 확장 가능한 텍스트 */
@@ -221,6 +222,7 @@
 .text-content h3 {
   font-size: 15px;
   color: #1a1a1a;
+  font-weight: 400;
   margin: 0;
 }
 
@@ -259,6 +261,7 @@
 .other-works-header h3 {
   font-size: 15px;
   color: #1a1a1a;
+  font-weight: 400;
   margin: 0;
 }
 
@@ -346,7 +349,7 @@
 /* 반응형 */
 @media (max-width: 480px) {
   .book-header {
-    padding: 16px;
+    padding: 20px;
     gap: 16px;
   }
   
@@ -357,11 +360,11 @@
   
   .lifebook-users,
   .expandable-text {
-    padding: 0 16px;
+    padding: 0 20px;
   }
   
   .divider {
-    margin: 0 16px;
+    margin: 0 0px;
   }
   
   .books-scroll {
