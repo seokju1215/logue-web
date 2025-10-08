@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BookFrame from '../components/BookFrame'
+import DownloadDialog from '../components/DownloadDialog'
 import basicAvatar from '../assets/basic_avatar.png'
 import './BookDetailPage.css'
 
@@ -18,6 +19,7 @@ const BookDetailPage = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [showFullToc, setShowFullToc] = useState(false)
+  const [showDownloadDialog, setShowDownloadDialog] = useState(false)
 
   // 책 정보 가져오기
   useEffect(() => {
@@ -197,8 +199,9 @@ const BookDetailPage = () => {
     }
   }
 
-  const handleUserClick = (userId) => {
-    navigate(`/${userId}`)
+  const handleUserClick = (e) => {
+    e.preventDefault()
+    setShowDownloadDialog(true)
   }
 
   if (isLoading) {
@@ -277,7 +280,7 @@ const BookDetailPage = () => {
               <div style={{ height: '12px' }}></div>
               <div className="users-list">
                 {lifebookUsers.slice(0, 3).map((user) => (
-                  <div key={user.id} className="user-item" onClick={() => handleUserClick(user.username)}>
+                  <div key={user.id} className="user-item" onClick={handleUserClick}>
                     <img 
                       src={user.avatar_url && user.avatar_url !== 'basic' ? user.avatar_url : basicAvatar} 
                       alt={user.name || user.username}
@@ -287,7 +290,7 @@ const BookDetailPage = () => {
                       <p className="user-name">{user.name || user.username}</p>
                       <p className="user-username">@{user.username}</p>
                     </div>
-                    <button className="follow-button">팔로우 +</button>
+                    <button className="follow-button">팔로우</button>
                   </div>
                 ))}
               </div>
@@ -376,6 +379,15 @@ const BookDetailPage = () => {
 
         <div style={{ height: '40px' }}></div>
       </main>
+
+      {/* DownloadDialog */}
+      {showDownloadDialog && (
+        <DownloadDialog
+          onClose={() => setShowDownloadDialog(false)}
+          onEdit={() => {}}
+          onDelete={() => setShowDownloadDialog(false)}
+        />
+      )}
     </div>
   )
 }
