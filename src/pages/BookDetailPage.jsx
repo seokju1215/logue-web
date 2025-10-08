@@ -294,13 +294,15 @@ const BookDetailPage = () => {
                   </div>
                 ))}
               </div>
-              {lifebookUsers.length > 3 && (
-                <div className="more-users">
-                  <button className="more-button">더보기</button>
-                  <div style={{ height: '30px' }}></div>
-                  <div className="divider"></div>
-                </div>
-              )}
+              <div>
+                {lifebookUsers.length > 3 && (
+                  <div style={{ textAlign: 'center' }}>
+                    <button className="more-button">더보기</button>
+                  </div>
+                )}
+                <div style={{ height: lifebookUsers.length > 3 ? '0px' : '30px' }}></div>
+                <div className="divider"></div>
+              </div>
             </section>
           </>
         )}
@@ -430,9 +432,9 @@ const ExpandableText = ({ title, content, maxLines, expanded, onToggle }) => {
           {content}
         </p>
       </div>
-      <div style={{ height: '50px' }}>
+      <div>
         {shouldShowMore && !expanded && (
-          <div className="expand-button-container">
+          <div style={{ textAlign: 'center' }}>
             <button className="expand-button" onClick={onToggle}>
               더보기
             </button>
