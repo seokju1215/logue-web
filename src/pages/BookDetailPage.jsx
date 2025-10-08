@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BookFrame from '../components/BookFrame'
@@ -296,7 +296,7 @@ const BookDetailPage = () => {
               </div>
               <div>
                 {lifebookUsers.length > 3 && (
-                  <div style={{ textAlign: 'center' }}>
+                  <div style={{ height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <button className="more-button">더보기</button>
                   </div>
                 )}
@@ -396,22 +396,18 @@ const BookDetailPage = () => {
 
 // 확장 가능한 텍스트 컴포넌트
 const ExpandableText = ({ title, content, maxLines, expanded, onToggle }) => {
+  const contentRef = useRef(null)
+  const [shouldShowMore, setShouldShowMore] = useState(false)
+
+  useEffect(() => {
+    if (contentRef.current) {
+      const maxHeight = maxLines * 2 * 14 // line-height: 2, font-size: 14px
+      const actualHeight = contentRef.current.scrollHeight
+      setShouldShowMore(actualHeight > maxHeight)
+    }
+  }, [content, maxLines])
+
   if (!content || content.trim() === '') return null
-
-  // 실제 텍스트 줄 수 계산 (my_logue와 동일한 방식)
-  const screenWidth = window.innerWidth
-  const availableWidth = screenWidth - 44 // 좌우 패딩 22 * 2
-  const textStyle = {
-    fontSize: 14,
-    color: '#858585',
-    lineHeight: 2
-  }
-
-  // 간단한 줄 수 계산 (더 정확한 계산을 위해)
-  const words = content.split(' ')
-  const avgCharsPerLine = Math.floor(availableWidth / 8) // 대략적인 문자 수
-  const estimatedLines = Math.ceil(words.join(' ').length / avgCharsPerLine)
-  const shouldShowMore = estimatedLines > maxLines
 
   return (
     <div className="expandable-text">
@@ -420,6 +416,7 @@ const ExpandableText = ({ title, content, maxLines, expanded, onToggle }) => {
         <h3>{title}</h3>
         <div style={{ height: '12px' }}></div>
         <p 
+          ref={contentRef}
           className="expandable-text-content"
           style={{
             display: 'block',
@@ -434,7 +431,7 @@ const ExpandableText = ({ title, content, maxLines, expanded, onToggle }) => {
       </div>
       <div>
         {shouldShowMore && !expanded && (
-          <div style={{ textAlign: 'center' }}>
+          <div style={{  height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <button className="expand-button" onClick={onToggle}>
               더보기
             </button>
