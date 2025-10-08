@@ -255,7 +255,7 @@
 }
 
 .other-works-header {
-  padding: 0 22px;
+  padding: 0 26px;
 }
 
 .other-works-header h3 {
@@ -266,7 +266,7 @@
 }
 
 .author-name {
-  padding: 0 22px;
+  padding: 0 26px;
 }
 
 .author-name h4 {
@@ -281,8 +281,8 @@
 
 .books-scroll {
   display: flex;
-  gap: 23px;
-  padding: 0 22px 0 22px;
+  gap: 0;
+  padding: 0 26px;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -294,15 +294,18 @@
 
 .book-card {
   flex-shrink: 0;
-  width: calc((100vw - 40px - 46px) / 3); /* 3열 그리드 */
-  max-width: 120px;
+  width: calc((100vw - 52px - 46px) / 3); /* horizontalPadding 26*2=52, spacing (3-1)*23=46 */
+  margin-right: 23px;
   cursor: pointer;
+}
+
+.book-card:last-child {
+  margin-right: 0;
 }
 
 .book-card .book-frame {
   width: 100%;
-  aspect-ratio: 2/3;
-  margin-bottom: 8px;
+  height: 100%;
 }
 
 .book-card-title {
@@ -368,10 +371,10 @@
   }
   
   .books-scroll {
-    padding: 0 16px;
+    padding: 0 26px;
   }
   
   .book-card {
-    width: calc((100vw - 32px - 46px) / 3);
+    width: calc((100vw - 52px - 46px) / 3);
   }
 }

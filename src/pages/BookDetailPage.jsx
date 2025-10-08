@@ -349,14 +349,27 @@ const BookDetailPage = () => {
                     <div style={{ height: '16px' }}></div>
                     <div className="books-scroll">
                       {firstAuthorBooks.map((book, index) => {
-                        console.log(`책 ${index}:`, book.title, '이미지:', book.image)
+                        const screenWidth = window.innerWidth
+                        const horizontalPadding = 26
+                        const spacing = 23
+                        const itemCountPerRow = 3
+
+                        const totalSpacing = (itemCountPerRow - 1) * spacing
+                        const availableWidth = screenWidth - (2 * horizontalPadding) - totalSpacing
+                        const bookWidth = availableWidth / itemCountPerRow
+                        const bookHeight = bookWidth * 1.5
+
                         return (
                           <div 
                             key={book.isbn || index}
                             className="book-card"
                             onClick={() => handleBookClick(book)}
+                            style={{ width: `${bookWidth}px` }}
                           >
-                            <BookFrame imageUrl={book.image || ''} />
+                            <div style={{ width: `${bookWidth}px`, height: `${bookHeight}px` }}>
+                              <BookFrame imageUrl={book.image || ''} />
+                            </div>
+                            <div style={{ height: '8px' }}></div>
                             <p className="book-card-title">{book.title || ''}</p>
                           </div>
                         )
