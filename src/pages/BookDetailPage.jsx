@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BookFrame from '../components/BookFrame'
 import DownloadDialog from '../components/DownloadDialog'
+import { searchBooksByAuthor } from '../lib/aladinApi'
 import basicAvatar from '../assets/basic_avatar.png'
 import './BookDetailPage.css'
 
@@ -20,6 +21,7 @@ const BookDetailPage = () => {
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [showFullToc, setShowFullToc] = useState(false)
   const [showDownloadDialog, setShowDownloadDialog] = useState(false)
+  const [showAllAuthors, setShowAllAuthors] = useState(false)
 
   // 책 정보 가져오기
   useEffect(() => {
@@ -143,29 +145,24 @@ const BookDetailPage = () => {
     
     for (const author of authors) {
       try {
-        console.log(`저자 "${author}"의 책 검색 시작`)
+        console.log(`저자 "${author}"의 책 검색 시작 (알라딘 API)`)
         
-        // 내 DB에서 저자로 책 검색 (books 테이블에서 직접 검색)
-        const { data: dbBooks, error } = await supabase
-          .from('books')
-          .select('*')
-          .ilike('author', `%${author}%`)
-          .limit(10)
+        // 알라딘 API로 저자의 책 검색
+        const aladinBooks = await searchBooksByAuthor(author)
 
-        if (error) {
-          console.error(`저자 "${author}"의 책 검색 오류:`, error)
-          continue
-        }
+        console.log(`저자 "${author}"의 알라딘 검색 결과:`, aladinBooks)
 
-        console.log(`저자 "${author}"의 책 검색 결과:`, dbBooks)
-
-        if (dbBooks && dbBooks.length > 0) {
-          result[author] = dbBooks.map(book => ({
-            ...book,
-            isbn: book.isbn || book.isbn13,
-            isbn13: book.isbn13 || book.isbn,
-            image: book.image
-          }))
+        if (aladinBooks && aladinBooks.length > 0) {
+          // 현재 보고 있는 책 제외
+          const filteredBooks = aladinBooks.filter(book => {
+            const bookIsbn = book.isbn13 || book.isbn
+            const currentIsbn = bookId
+            return bookIsbn !== currentIsbn
+          })
+          
+          if (filteredBooks.length > 0) {
+            result[author] = filteredBooks
+          }
         }
       } catch (error) {
         console.error(`저자 "${author}"의 책 검색 실패:`, error)
@@ -338,48 +335,56 @@ const BookDetailPage = () => {
               <div style={{ height: '16px' }}></div>
               {(() => {
                 const authors = Object.keys(authorBooks)
-                const firstAuthor = authors[0]
-                const firstAuthorBooks = authorBooks[firstAuthor] || []
+                const displayAuthors = showAllAuthors ? authors : [authors[0]]
                 
                 return (
                   <>
-                    <div className="author-name">
-                      <h4>{firstAuthor}</h4>
-                    </div>
-                    <div style={{ height: '16px' }}></div>
-                    <div className="books-scroll">
-                      {firstAuthorBooks.map((book, index) => {
-                        const screenWidth = window.innerWidth
-                        const horizontalPadding = 26
-                        const spacing = 23
-                        const itemCountPerRow = 3
-
-                        const totalSpacing = (itemCountPerRow - 1) * spacing
-                        const availableWidth = screenWidth - (2 * horizontalPadding) - totalSpacing
-                        const bookWidth = availableWidth / itemCountPerRow
-                        const bookHeight = bookWidth * 1.5
-
-                        return (
-                          <div 
-                            key={book.isbn || index}
-                            className="book-card"
-                            onClick={() => handleBookClick(book)}
-                            style={{ width: `${bookWidth}px` }}
-                          >
-                            <div style={{ width: `${bookWidth}px`, height: `${bookHeight}px` }}>
-                              <BookFrame imageUrl={book.image || ''} />
-                            </div>
-                            <div style={{ height: '8px' }}></div>
-                            <p className="book-card-title">{book.title || ''}</p>
+                    {displayAuthors.map((author, authorIndex) => {
+                      const authorBooksForAuthor = authorBooks[author] || []
+                      
+                      return (
+                        <div key={author}>
+                          {authorIndex > 0 && <div style={{ height: '24px' }}></div>}
+                          <div className="author-name">
+                            <h4>{author}</h4>
                           </div>
-                        )
-                      })}
-                    </div>
-                    {authors.length > 1 && (
+                          <div style={{ height: '16px' }}></div>
+                          <div className="books-scroll">
+                            {authorBooksForAuthor.map((book, index) => {
+                              const screenWidth = window.innerWidth
+                              const horizontalPadding = 26
+                              const spacing = 23
+                              const itemCountPerRow = 3
+
+                              const totalSpacing = (itemCountPerRow - 1) * spacing
+                              const availableWidth = screenWidth - (2 * horizontalPadding) - totalSpacing
+                              const bookWidth = availableWidth / itemCountPerRow
+                              const bookHeight = bookWidth * 1.5
+
+                              return (
+                                <div 
+                                  key={book.isbn || index}
+                                  className="book-card"
+                                  onClick={() => handleBookClick(book)}
+                                  style={{ width: `${bookWidth}px` }}
+                                >
+                                  <div style={{ width: `${bookWidth}px`, height: `${bookHeight}px` }}>
+                                    <BookFrame imageUrl={book.image || ''} />
+                                  </div>
+                                  <div style={{ height: '8px' }}></div>
+                                  <p className="book-card-title">{book.title || ''}</p>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })}
+                    {authors.length > 1 && !showAllAuthors && (
                       <>
                         <div style={{ height: '16px' }}></div>
                         <div className="more-authors-button">
-                          <button className="more-button">더보기</button>
+                          <button className="more-button" onClick={() => setShowAllAuthors(true)}>더보기</button>
                         </div>
                       </>
                     )}
