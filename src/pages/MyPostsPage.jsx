@@ -238,7 +238,6 @@ function MyPostsPage() {
                 onDeleteSuccess={() => handleDeleteSuccess(index)}
                 onEditSuccess={handleEditSuccess}
                 onTap={() => handlePostTap(post)}
-                onBookExplore={() => setShowDownloadDialog(true)}
               />
             </div>
           )

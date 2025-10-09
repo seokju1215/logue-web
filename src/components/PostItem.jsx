@@ -20,8 +20,16 @@ function PostItem({ post, isMyPost, onDeleteSuccess, onEditSuccess, onTap, onBoo
   }
 
   const handleBookDetailClick = () => {
-    navigate(`/book/${post.bookId}`, { 
-      state: { bookId: post.bookId },
+    // 책 ID 가져오기 (book_id 또는 books.id)
+    const bookId = post.book_id || post.books?.id
+    
+    if (!bookId) {
+      console.error('책 ID를 찾을 수 없습니다:', post)
+      return
+    }
+    
+    // DB와 알라딘에서 책 정보를 다시 가져오도록 state 없이 이동
+    navigate(`/book/${bookId}`, { 
       replace: false
     })
   }
