@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import BookFrame from '../components/BookFrame'
 import DownloadDialog from '../components/DownloadDialog'
@@ -10,6 +10,7 @@ import './BookDetailPage.css'
 const BookDetailPage = () => {
   const { bookId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   
   // 상태 관리
   const [book, setBook] = useState(null)
@@ -25,8 +26,12 @@ const BookDetailPage = () => {
 
   // 책 정보 가져오기
   useEffect(() => {
+    // 상태 초기화
+    setShowAllAuthors(false)
+    window.scrollTo(0, 0)
+    
     fetchBookDetail()
-  }, [bookId])
+  }, [bookId, location.state])
 
   const fetchBookDetail = async () => {
     try {
@@ -35,7 +40,13 @@ const BookDetailPage = () => {
       // 책 정보 가져오기
       let bookData = null
       
-      if (bookId?.length === 36) {
+      // 1. location.state에 책 데이터가 있는지 먼저 확인 (다른 작품에서 넘어온 경우)
+      if (location.state?.bookData) {
+        bookData = location.state.bookData
+        console.log('전달받은 책 데이터 사용:', bookData)
+      }
+      // 2. DB에서 검색
+      else if (bookId?.length === 36) {
         // book_id로 검색
         const { data, error } = await supabase
           .from('user_books')
@@ -68,8 +79,12 @@ const BookDetailPage = () => {
       setBook(bookData)
       setIsLoading(false)
 
-      // 인생책으로 설정한 사용자들 가져오기
-      await fetchLifebookUsers(bookData)
+      // 인생책으로 설정한 사용자들 가져오기 (DB에 있는 경우만)
+      if (bookData.id) {
+        await fetchLifebookUsers(bookData)
+      } else {
+        setIsLoadingLifebookUsers(false)
+      }
       
       // 저자별 다른 작품 가져오기
       if (bookData?.author) {
@@ -192,7 +207,8 @@ const BookDetailPage = () => {
   const handleBookClick = (book) => {
     const bookId = book.isbn13 || book.isbn || ''
     if (bookId) {
-      navigate(`/book/${bookId}`)
+      // 책 데이터를 state로 함께 전달
+      navigate(`/book/${bookId}`, { state: { bookData: book } })
     }
   }
 
