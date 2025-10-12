@@ -12,27 +12,41 @@ export const searchBooksByAuthor = async (author) => {
   try {
     const baseUrl = getBaseUrl()
     
+    console.log('🔍 환경 확인:', {
+      isDev: import.meta.env.DEV,
+      mode: import.meta.env.MODE,
+      baseUrl: baseUrl
+    })
+    
     // 개발 환경에서는 /aladin/ItemSearch.aspx로 요청
     // 프로덕션에서는 /api/aladin-search?Query=... 로 요청
     let url
     if (import.meta.env.DEV) {
       // Vite 프록시: /aladin/ItemSearch.aspx?...
       const ttbKey = import.meta.env.VITE_ALADIN_TTB_KEY
+      console.log('🔑 개발 환경 TTB 키 확인:', ttbKey ? '✅ 있음' : '❌ 없음')
       url = `${baseUrl}/ItemSearch.aspx?ttbkey=${ttbKey}&Query=${encodeURIComponent(author)}&QueryType=Author&MaxResults=10&start=1&SearchTarget=Book&output=js&Version=20131101`
     } else {
       // Vercel API: /api/aladin-search?Query=... (ttbkey는 서버에서 자동 추가)
+      console.log('🚀 프로덕션 환경 - 서버에서 TTB 키 추가')
       url = `${baseUrl}?Query=${encodeURIComponent(author)}&QueryType=Author&MaxResults=10&start=1&SearchTarget=Book`
     }
     
-    console.log('알라딘 API 요청 URL:', url)
+    console.log('📡 알라딘 API 요청 URL:', url)
     
     const response = await fetch(url)
     
+    console.log('📥 응답 상태:', response.status, response.statusText)
+    
     if (!response.ok) {
-      throw new Error(`알라딘 API 요청 실패: ${response.status}`)
+      // 에러 응답 본문 확인
+      const errorText = await response.text()
+      console.error('❌ 에러 응답:', errorText)
+      throw new Error(`알라딘 API 요청 실패: ${response.status} - ${errorText}`)
     }
     
     const data = await response.json()
+    console.log('✅ 응답 데이터:', data.item?.length || 0, '개의 결과')
     
     if (!data.item || data.item.length === 0) {
       return []
@@ -62,21 +76,37 @@ export const searchBooks = async (query) => {
   try {
     const baseUrl = getBaseUrl()
     
+    console.log('🔍 환경 확인:', {
+      isDev: import.meta.env.DEV,
+      mode: import.meta.env.MODE,
+      baseUrl: baseUrl
+    })
+    
     let url
     if (import.meta.env.DEV) {
       const ttbKey = import.meta.env.VITE_ALADIN_TTB_KEY
+      console.log('🔑 개발 환경 TTB 키 확인:', ttbKey ? '✅ 있음' : '❌ 없음')
       url = `${baseUrl}/ItemSearch.aspx?ttbkey=${ttbKey}&Query=${encodeURIComponent(query)}&QueryType=Title&MaxResults=10&start=1&SearchTarget=Book&output=js&Version=20131101`
     } else {
+      console.log('🚀 프로덕션 환경 - 서버에서 TTB 키 추가')
       url = `${baseUrl}?Query=${encodeURIComponent(query)}&QueryType=Title&MaxResults=10&start=1&SearchTarget=Book`
     }
     
+    console.log('📡 알라딘 API 요청 URL:', url)
+    
     const response = await fetch(url)
     
+    console.log('📥 응답 상태:', response.status, response.statusText)
+    
     if (!response.ok) {
-      throw new Error(`알라딘 API 요청 실패: ${response.status}`)
+      // 에러 응답 본문 확인
+      const errorText = await response.text()
+      console.error('❌ 에러 응답:', errorText)
+      throw new Error(`알라딘 API 요청 실패: ${response.status} - ${errorText}`)
     }
     
     const data = await response.json()
+    console.log('✅ 응답 데이터:', data.item?.length || 0, '개의 결과')
     
     if (!data.item || data.item.length === 0) {
       return []
