@@ -60,8 +60,10 @@ export const getUserBooks = async (userId) => {
       .eq('user_id', userId)
       .eq('is_archived', false)
       .order('order_index', { ascending: true })
+      .limit(10000) // 충분히 큰 제한 설정
 
     if (error) throw error
+    console.log(`사용자 ${userId}의 책 개수:`, data?.length || 0)
     return data || []
   } catch (error) {
     console.error('사용자 책 가져오기 실패:', error)
@@ -78,6 +80,7 @@ export const getUserBooksWithProfiles = async (userId) => {
       })
 
     if (error) throw error
+    console.log(`사용자 ${userId}의 책 리뷰 개수:`, data?.length || 0)
     return data || []
   } catch (error) {
     console.error('사용자 책 리뷰 가져오기 실패:', error)
@@ -107,7 +110,7 @@ export const getBookPost = async (userId, bookId) => {
 }
 
 // 보관된 책들 가져오기 (페이지네이션)
-export const getArchivedBooks = async (userId, limit = 200, offset = 0) => {
+export const getArchivedBooks = async (userId, limit = 10000, offset = 0) => {
   try {
     const { data, error } = await supabase
       .rpc('get_other_user_archived_books_page', {
@@ -117,6 +120,7 @@ export const getArchivedBooks = async (userId, limit = 200, offset = 0) => {
       })
 
     if (error) throw error
+    console.log(`사용자 ${userId}의 보관된 책 개수:`, data?.length || 0)
     return data || []
   } catch (error) {
     console.error('보관된 책 가져오기 실패:', error)
