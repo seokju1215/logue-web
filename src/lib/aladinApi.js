@@ -53,19 +53,56 @@ export const searchBooksByAuthor = async (author) => {
     }
     
     // Flutter 형식과 동일하게 변환
-    return data.item.map(book => ({
-      isbn: book.isbn,
-      isbn13: book.isbn13,
-      title: book.title,
-      author: book.author,
-      publisher: book.publisher,
-      published_date: book.pubDate,
-      description: book.description,
-      image: book.cover,
-      link: book.link,
-      page_count: book.subInfo?.itemPage || null,
-      toc: book.fullDescription2 || null
-    }))
+    return data.item.map(book => {
+      // 이미지 처리 (Flutter와 동일)
+      let cover = book.cover || ''
+      if (cover.startsWith('http://')) {
+        cover = cover.replace('http://', 'https://')
+      }
+      // cover(sum|숫자)를 cover500으로 변경
+      cover = cover.replace(/cover(sum|\d{2,3})/g, 'cover500')
+
+      // 제목과 부제 분리 (Flutter와 동일)
+      let rawTitle = book.title || ''
+      let title = rawTitle
+      let subtitle = ''
+
+      if (rawTitle.includes(' - ')) {
+        const parts = rawTitle.split(' - ')
+        title = parts[0].trim()
+        subtitle = parts.slice(1).join(' - ').trim()
+      }
+
+      // subInfo에서 subtitle 우선순위 적용
+      const rawSub = book.subInfo?.subTitle?.toString().trim()
+      if (rawSub && rawSub.length > 0) {
+        subtitle = rawSub
+      }
+
+      // 목차 처리 (HTML 태그 제거)
+      let toc = book.subInfo?.toc?.toString() || ''
+      if (toc) {
+        toc = toc
+          .replace(/<[^>]*>/g, '') // HTML 태그 제거
+          .replace(/&nbsp;/g, ' ') // 공백 문자 처리
+          .trim()
+      }
+
+      return {
+        isbn: book.isbn,
+        isbn13: book.isbn13,
+        title: title,
+        subtitle: subtitle,
+        author: book.author,
+        publisher: book.publisher,
+        published_date: book.pubDate,
+        description: book.description,
+        image: cover,
+        link: book.link,
+        page_count: book.subInfo?.itemPage || null,
+        toc: toc
+      }
+    })
   } catch (error) {
     console.error('알라딘 API 검색 실패:', error)
     return []
@@ -112,19 +149,56 @@ export const searchBooks = async (query) => {
       return []
     }
     
-    return data.item.map(book => ({
-      isbn: book.isbn,
-      isbn13: book.isbn13,
-      title: book.title,
-      author: book.author,
-      publisher: book.publisher,
-      published_date: book.pubDate,
-      description: book.description,
-      image: book.cover,
-      link: book.link,
-      page_count: book.subInfo?.itemPage || null,
-      toc: book.fullDescription2 || null
-    }))
+    return data.item.map(book => {
+      // 이미지 처리 (Flutter와 동일)
+      let cover = book.cover || ''
+      if (cover.startsWith('http://')) {
+        cover = cover.replace('http://', 'https://')
+      }
+      // cover(sum|숫자)를 cover500으로 변경
+      cover = cover.replace(/cover(sum|\d{2,3})/g, 'cover500')
+
+      // 제목과 부제 분리 (Flutter와 동일)
+      let rawTitle = book.title || ''
+      let title = rawTitle
+      let subtitle = ''
+
+      if (rawTitle.includes(' - ')) {
+        const parts = rawTitle.split(' - ')
+        title = parts[0].trim()
+        subtitle = parts.slice(1).join(' - ').trim()
+      }
+
+      // subInfo에서 subtitle 우선순위 적용
+      const rawSub = book.subInfo?.subTitle?.toString().trim()
+      if (rawSub && rawSub.length > 0) {
+        subtitle = rawSub
+      }
+
+      // 목차 처리 (HTML 태그 제거)
+      let toc = book.subInfo?.toc?.toString() || ''
+      if (toc) {
+        toc = toc
+          .replace(/<[^>]*>/g, '') // HTML 태그 제거
+          .replace(/&nbsp;/g, ' ') // 공백 문자 처리
+          .trim()
+      }
+
+      return {
+        isbn: book.isbn,
+        isbn13: book.isbn13,
+        title: title,
+        subtitle: subtitle,
+        author: book.author,
+        publisher: book.publisher,
+        published_date: book.pubDate,
+        description: book.description,
+        image: cover,
+        link: book.link,
+        page_count: book.subInfo?.itemPage || null,
+        toc: toc
+      }
+    })
   } catch (error) {
     console.error('알라딘 API 검색 실패:', error)
     return []
