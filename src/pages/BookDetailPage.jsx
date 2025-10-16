@@ -367,7 +367,7 @@ const BookDetailPage = () => {
                           <div style={{ height: '16px' }}></div>
                           <div className="books-scroll">
                             {authorBooksForAuthor.map((book, index) => {
-                              const screenWidth = window.innerWidth
+                              const screenWidth = window.innerWidth <= 450 ? window.innerWidth : 400
                               const horizontalPadding = 26
                               const spacing = 23
                               const itemCountPerRow = 3
