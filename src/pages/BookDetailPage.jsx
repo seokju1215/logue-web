@@ -310,7 +310,7 @@ const BookDetailPage = () => {
               <div>
                 {lifebookUsers.length > 3 && (
                   <div style={{ height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <button className="more-button">더보기</button>
+                    <button className="more-button" onClick={() => setShowDownloadDialog(true)}>더보기</button>
                   </div>
                 )}
                 <div style={{ height: lifebookUsers.length > 3 ? '0px' : '30px' }}></div>
