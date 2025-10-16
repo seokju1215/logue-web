@@ -143,10 +143,9 @@
 .user-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
+  gap: 22px;
+  padding: 7px 0;
   cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 .user-item:last-child {
@@ -154,8 +153,8 @@
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -166,7 +165,7 @@
 
 .user-name {
   font-size: 14px;
-  color: #1a1a1a;
+  color: #191A1C;
   margin: 0 0 2px 0;
   font-weight: 500;
 }
