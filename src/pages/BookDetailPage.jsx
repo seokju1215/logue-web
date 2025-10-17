@@ -28,6 +28,10 @@ const BookDetailPage = () => {
   useEffect(() => {
     // 상태 초기화
     setShowAllAuthors(false)
+    setLifebookUsers([])  // 인생책 사용자 목록 초기화
+    setIsLoadingLifebookUsers(true)  // 로딩 상태 초기화
+    setAuthorBooks({})  // 저자별 책 목록 초기화
+    setErrorMessage('')  // 에러 메시지 초기화
     window.scrollTo(0, 0)
     
     fetchBookDetail()
@@ -79,12 +83,8 @@ const BookDetailPage = () => {
       setBook(bookData)
       setIsLoading(false)
 
-      // 인생책으로 설정한 사용자들 가져오기 (DB에 있는 경우만)
-      if (bookData.id) {
-        await fetchLifebookUsers(bookData)
-      } else {
-        setIsLoadingLifebookUsers(false)
-      }
+      // 인생책으로 설정한 사용자들 가져오기
+      await fetchLifebookUsers(bookData)
       
       // 저자별 다른 작품 가져오기
       if (bookData?.author) {
@@ -103,8 +103,7 @@ const BookDetailPage = () => {
     try {
       setIsLoadingLifebookUsers(true)
       
-      // 해당 책을 인생책으로 설정한 사용자들 가져오기
-      const { data: userBooks, error } = await supabase
+      let query = supabase
         .from('user_books')
         .select(`
           *,
@@ -115,8 +114,22 @@ const BookDetailPage = () => {
             avatar_url
           )
         `)
-        .eq('book_id', bookData.id)
         .eq('is_archived', false)
+
+      // bookData.id가 있으면 UUID로 검색, 없으면 ISBN으로 직접 검색
+      if (bookData.id) {
+        query = query.eq('book_id', bookData.id)
+      } else if (bookData.isbn13 || bookData.isbn) {
+        const isbn = bookData.isbn13 || bookData.isbn
+        query = query.eq('isbn', isbn)
+      } else {
+        console.log('책 ID 또는 ISBN이 없어서 인생책 사용자를 가져올 수 없습니다.')
+        setLifebookUsers([])
+        setIsLoadingLifebookUsers(false)
+        return
+      }
+
+      const { data: userBooks, error } = await query
 
       if (error) throw error
 
