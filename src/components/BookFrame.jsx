@@ -7,6 +7,11 @@ const BookFrame = ({ imageUrl }) => {
     : imageUrl;
 
   const [imgError, setImgError] = useState(false);
+  
+  // 디버깅을 위한 로그
+  if (imageUrl) {
+    console.log('BookFrame 이미지 URL:', imageUrl, '-> 변환된 URL:', safeUrl)
+  }
 
   return (
     <div

@@ -604,7 +604,12 @@
   border: 0.5px solid #D9D9D9;
   box-shadow: none;
   filter: none;
- 
+}
+
+/* ProfilePage의 book-cover는 고정 크기 제거 */
+.profile-page .book-cover {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .book-cover img {

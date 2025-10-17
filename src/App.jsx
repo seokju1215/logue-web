@@ -4,6 +4,7 @@ import ProfilePage from './pages/ProfilePage'
 import BookPostPage from './pages/BookPostPage'
 import MyPostsPage from './pages/MyPostsPage'
 import PostDetailPage from './pages/PostDetailPage'
+import BookDetailPage from './pages/BookDetailPage'
 import HomePage from './pages/HomePage'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/:username/book/:bookId" element={<BookPostPage />} />
           <Route path="/:username/posts" element={<MyPostsPage />} />
           <Route path="/post/:postId" element={<PostDetailPage />} />
+          <Route path="/book/:bookId" element={<BookDetailPage />} />
         </Routes>
       </div>
     </Router>

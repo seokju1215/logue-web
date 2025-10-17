@@ -178,10 +178,10 @@ function MyPostsPage() {
       }}>
         <button onClick={handleBack} style={{
           position: 'absolute',
-          left: '25px',
+          left: '20px',
           background: 'none',
           border: 'none',
-          padding: '4px',
+          padding: '0px',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -190,7 +190,7 @@ function MyPostsPage() {
           borderRadius: '4px',
           transition: 'background-color 0.2s',
         }}>
-          <img src="/back_arrow.svg" alt="뒤로가기" width="20" height="20" />
+          <img src="/back_arrow.svg" alt="뒤로가기" width="24" height="24" />
         </button>
         <h1 style={{
           fontWeight: '600',
@@ -238,7 +238,6 @@ function MyPostsPage() {
                 onDeleteSuccess={() => handleDeleteSuccess(index)}
                 onEditSuccess={handleEditSuccess}
                 onTap={() => handlePostTap(post)}
-                onBookExplore={() => setShowDownloadDialog(true)}
               />
             </div>
           )

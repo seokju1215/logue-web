@@ -232,14 +232,19 @@ function ProfilePage() {
   }
 
   const handleBookClick = (book) => {
-    // 책장 탭에서는 클릭 비활성화
-    if (activeTab === 1) {
-      return
+    // 대표 탭에서는 기존대로 MyPostsPage로 이동
+    if (activeTab === 0) {
+      const bookId = book.book_id || book.id || (book.books && book.books.id)
+      if (bookId && username) {
+        navigate(`/${username}/posts`, { state: { bookId } })
+      }
     }
-    
-    const bookId = book.book_id || book.id || (book.books && book.books.id)
-    if (bookId && username) {
-      navigate(`/${username}/posts`, { state: { bookId } })
+    // 책장 탭에서는 BookDetailPage로 이동
+    else if (activeTab === 1) {
+      const bookId = book.book_id || book.id || (book.books && book.books.id) || book.isbn || book.isbn13
+      if (bookId) {
+        navigate(`/book/${bookId}`)
+      }
     }
   }
 
