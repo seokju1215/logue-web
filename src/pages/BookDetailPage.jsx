@@ -313,8 +313,8 @@ const BookDetailPage = () => {
                       className="user-avatar"
                     />
                     <div className="user-info">
-                      <p className="user-name">{user.name || user.username}</p>
-                      <p className="user-username">@{user.username}</p>
+                      <p className="user-name">{user.username}</p>
+                      <p className="user-username">{user.name || user.username}</p>
                     </div>
                     <button className="follow-button">팔로우</button>
                   </div>
