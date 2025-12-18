@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, User, MoreVertical } from '../components/icons'
+import basicAvatar from '../assets/basic_avatar.png'
 import DownloadDialog from '../components/DownloadDialog'
 import './PostDetailPage.css'
 import React from 'react'
@@ -227,6 +228,96 @@ function PostDetailPage() {
         </div>
         
         <div style={{ height: '10px' }}></div>
+        {/* Row - 사용자 정보 및 버튼 */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        width: '100%'
+      }}>
+        {/* GestureDetector - 사용자 정보 */}
+        <div 
+          onClick={handleProfileClick}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {(avatarUrl === '' || avatarUrl === 'basic') ? (
+              <div style={{
+                width: '45px',
+                height: '45px',
+                borderRadius: '50%',
+                backgroundColor: '#E0E0E0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden'
+              }}>
+                <img 
+                  src={basicAvatar} 
+                  alt="기본 아바타"
+                  style={{ width: '45px', height: '45px', objectFit: 'cover' }}
+                  onError={(e) => {
+                    e.target.style.display = 'none'
+                    e.target.nextSibling.style.display = 'block'
+                  }}
+                />
+                <div style={{ 
+                  width: '45px', 
+                  height: '45px', 
+                  backgroundColor: '#E0E0E0',
+                  display: 'none'
+                }}></div>
+              </div>
+            ) : (
+              <div style={{
+                width: '45px',
+                height: '45px',
+                borderRadius: '50%',
+                backgroundImage: `url(${avatarUrl})`,
+                backgroundColor: '#E0E0E0',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}></div>
+            )}
+            
+            {/* SizedBox(width: 9) */}
+            <div style={{ width: '9px' }}></div>
+            
+            <span style={{
+              fontSize: '14px',
+              color: '#1A1A1A', // AppColors.black900
+              lineHeight: '1.5',
+              letterSpacing: '-0.32px',
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+            }}>
+              {userName}
+            </span>
+          </div>
+        </div>
+        
+        {/* Spacer */}
+        <div style={{ flex: 1 }}></div>
+        
+        {/* 조건부 버튼들 */}
+        <button
+          onClick={handleBookExplore}
+          style={{
+            border: '1px solid #B0B0B0', // AppColors.black300
+            borderRadius: '5px',
+            padding: '0 19px',
+            height: '34px',
+            fontSize: '14px',
+            color: '#858585', // AppColors.black500
+            lineHeight: '1',
+            fontWeight: '400',
+            backgroundColor: 'transparent',
+            cursor: 'pointer',
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+          }}
+        >
+          책 둘러보기 →
+        </button>
+      </div>
+      <div style={{ height: '10px' }}></div>
         
         {/* 리뷰 제목 */}
         {reviewTitle !== '' && (
