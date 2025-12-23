@@ -11,7 +11,7 @@ const BookDetailPage = () => {
   const { bookId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  
+
   // 상태 관리
   const [book, setBook] = useState(null)
   const [lifebookUsers, setLifebookUsers] = useState([])
@@ -33,17 +33,17 @@ const BookDetailPage = () => {
     setAuthorBooks({})  // 저자별 책 목록 초기화
     setErrorMessage('')  // 에러 메시지 초기화
     window.scrollTo(0, 0)
-    
+
     fetchBookDetail()
   }, [bookId, location.state])
 
   const fetchBookDetail = async () => {
     try {
       setIsLoading(true)
-      
+
       // 책 정보 가져오기
       let bookData = null
-      
+
       // 1. location.state에 책 데이터가 있는지 먼저 확인 (다른 작품에서 넘어온 경우)
       if (location.state?.bookData) {
         bookData = location.state.bookData
@@ -58,7 +58,7 @@ const BookDetailPage = () => {
           .eq('book_id', bookId)
           .limit(1)
           .single()
-        
+
         if (!error && data?.books) {
           bookData = data.books
         }
@@ -70,7 +70,7 @@ const BookDetailPage = () => {
           .or(`isbn.eq.${bookId},isbn13.eq.${bookId}`)
           .limit(1)
           .single()
-        
+
         if (!error && data) {
           bookData = data
         }
@@ -85,7 +85,7 @@ const BookDetailPage = () => {
 
       // 인생책으로 설정한 사용자들 가져오기
       await fetchLifebookUsers(bookData)
-      
+
       // 저자별 다른 작품 가져오기
       if (bookData?.author) {
         const authors = extractAuthors(bookData.author)
@@ -102,7 +102,7 @@ const BookDetailPage = () => {
   const fetchLifebookUsers = async (bookData) => {
     try {
       setIsLoadingLifebookUsers(true)
-      
+
       let query = supabase
         .from('user_books')
         .select(`
@@ -153,13 +153,13 @@ const BookDetailPage = () => {
 
   const extractAuthors = (authorString) => {
     if (!authorString) return []
-    
+
     const endIdx = authorString.indexOf('(지은이)')
-    const onlyAuthors = endIdx !== -1 
+    const onlyAuthors = endIdx !== -1
       ? authorString.substring(0, endIdx).trim()
       : authorString
 
-    const cleanAuthors = onlyAuthors.endsWith(',') 
+    const cleanAuthors = onlyAuthors.endsWith(',')
       ? onlyAuthors.substring(0, onlyAuthors.length - 1).trim()
       : onlyAuthors
 
@@ -170,11 +170,11 @@ const BookDetailPage = () => {
     if (authors.length === 0) return
 
     const result = {}
-    
+
     for (const author of authors) {
       try {
         console.log(`저자 "${author}"의 책 검색 시작 (알라딘 API)`)
-        
+
         // 알라딘 API로 저자의 책 검색
         const aladinBooks = await searchBooksByAuthor(author)
 
@@ -182,12 +182,22 @@ const BookDetailPage = () => {
 
         if (aladinBooks && aladinBooks.length > 0) {
           // 현재 보고 있는 책 제외
+          const excludePattern = /(세[\s\-]*트|\+|스[\s\-]*티[\s\-]*커)/i;
+
           const filteredBooks = aladinBooks.filter(book => {
             const bookIsbn = book.isbn13 || book.isbn
             const currentIsbn = bookId
-            return bookIsbn !== currentIsbn
+            const title = book.title || ''
+
+            // 1️⃣ 현재 보고 있는 책 제외
+            if (bookIsbn === currentIsbn) return false
+
+            // 2️⃣ 세트 / 스티커 / + 포함된 책 제외
+            if (excludePattern.test(title)) return false
+
+            return true
           })
-          
+
           if (filteredBooks.length > 0) {
             result[author] = filteredBooks
           }
@@ -254,7 +264,7 @@ const BookDetailPage = () => {
     <div className="book-detail-page">
       {/* 헤더 */}
       <header className="book-detail-header">
-        <button 
+        <button
           className="back-button"
           onClick={() => navigate(-1)}
         >
@@ -282,7 +292,7 @@ const BookDetailPage = () => {
               <p className="book-pages">{book.page_count} P</p>
             )}
             <p className="book-source">도서 정보: 알라딘 제공</p>
-            <button 
+            <button
               className="aladin-link"
               onClick={() => launchAladinLink(book.link)}
             >
@@ -307,8 +317,8 @@ const BookDetailPage = () => {
               <div className="users-list">
                 {lifebookUsers.slice(0, 3).map((user) => (
                   <div key={user.id} className="user-item" onClick={handleUserClick}>
-                    <img 
-                      src={user.avatar_url && user.avatar_url !== 'basic' ? user.avatar_url : basicAvatar} 
+                    <img
+                      src={user.avatar_url && user.avatar_url !== 'basic' ? user.avatar_url : basicAvatar}
                       alt={user.name || user.username}
                       className="user-avatar"
                     />
@@ -365,12 +375,12 @@ const BookDetailPage = () => {
               {(() => {
                 const authors = Object.keys(authorBooks)
                 const displayAuthors = showAllAuthors ? authors : [authors[0]]
-                
+
                 return (
                   <>
                     {displayAuthors.map((author, authorIndex) => {
                       const authorBooksForAuthor = authorBooks[author] || []
-                      
+
                       return (
                         <div key={author}>
                           {authorIndex > 0 && <div style={{ height: '24px' }}></div>}
@@ -391,7 +401,7 @@ const BookDetailPage = () => {
                               const bookHeight = bookWidth * 1.5
 
                               return (
-                                <div 
+                                <div
                                   key={book.isbn || index}
                                   className="book-card"
                                   onClick={() => handleBookClick(book)}
@@ -433,7 +443,7 @@ const BookDetailPage = () => {
       {showDownloadDialog && (
         <DownloadDialog
           onClose={() => setShowDownloadDialog(false)}
-          onEdit={() => {}}
+          onEdit={() => { }}
           onDelete={() => setShowDownloadDialog(false)}
         />
       )}
@@ -462,7 +472,7 @@ const ExpandableText = ({ title, content, maxLines, expanded, onToggle }) => {
         <div style={{ height: title === "목차" ? '39px' : '22px' }}></div>
         <h3>{title}</h3>
         <div style={{ height: '12px' }}></div>
-        <p 
+        <p
           ref={contentRef}
           className="expandable-text-content"
           style={{
@@ -478,7 +488,7 @@ const ExpandableText = ({ title, content, maxLines, expanded, onToggle }) => {
       </div>
       <div>
         {shouldShowMore && !expanded && (
-          <div style={{  height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <button className="expand-button" onClick={onToggle}>
               더보기
             </button>
