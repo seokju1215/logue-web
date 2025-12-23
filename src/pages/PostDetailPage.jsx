@@ -22,6 +22,20 @@ function PostDetailPage() {
       setLoading(false)
     }
   }, [post])
+  const handleBookDetailClick = () => {
+    // 책 ID 가져오기 (book_id 또는 books.id)
+    const bookId = post.book_id || post.books?.id
+    
+    if (!bookId) {
+      console.error('책 ID를 찾을 수 없습니다:', post)
+      return
+    }
+    
+    // DB와 알라딘에서 책 정보를 다시 가져오도록 state 없이 이동
+    navigate(`/book/${bookId}`, { 
+      replace: false
+    })
+  }
 
   const handleBack = () => {
     navigate(-1)
@@ -299,7 +313,7 @@ function PostDetailPage() {
         
         {/* 조건부 버튼들 */}
         <button
-          onClick={handleBookExplore}
+           onClick={typeof onBookExplore === 'function' ? onBookExplore : handleBookDetailClick}
           style={{
             border: '1px solid #B0B0B0', // AppColors.black300
             borderRadius: '5px',
